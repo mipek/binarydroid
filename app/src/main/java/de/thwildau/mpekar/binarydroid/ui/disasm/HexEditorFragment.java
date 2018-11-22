@@ -1,4 +1,4 @@
-package de.thwildau.mpekar.binarydroid.ui.binarydroid;
+package de.thwildau.mpekar.binarydroid.ui.disasm;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -11,25 +11,24 @@ import android.view.ViewGroup;
 
 import de.thwildau.mpekar.binarydroid.R;
 
-public class BinaryDroidFragment extends Fragment {
+public class HexEditorFragment extends Fragment {
 
-    private BinaryDroidViewModel mViewModel;
+    private HexEditorViewModel viewModel;
 
-    public static BinaryDroidFragment newInstance() {
-        return new BinaryDroidFragment();
+    public static HexEditorFragment newInstance(String binpath) {
+        return new HexEditorFragment();
     }
 
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.binary_droid_fragment, container, false);
+        return inflater.inflate(R.layout.hexed_fragment, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(BinaryDroidViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(HexEditorViewModel.class);
         // TODO: Use the ViewModel
     }
 
