@@ -9,14 +9,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import net.fornwall.jelf.ElfFile;
+
 import de.thwildau.mpekar.binarydroid.R;
 
 public class HexEditorFragment extends Fragment {
 
-    private HexEditorViewModel viewModel;
+    private DisassemblerViewModel viewModel;
+    private ElfFile elf;
 
-    public static HexEditorFragment newInstance(String binpath) {
-        return new HexEditorFragment();
+    public static HexEditorFragment newInstance(ElfFile elf) {
+        HexEditorFragment frag = new HexEditorFragment();
+        frag.elf = elf;
+        return frag;
     }
 
     @Override
@@ -28,8 +33,9 @@ public class HexEditorFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(this).get(HexEditorViewModel.class);
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProviders.of(this).get(DisassemblerViewModel.class);
+
+        viewModel.setBinary(elf);
     }
 
 }
