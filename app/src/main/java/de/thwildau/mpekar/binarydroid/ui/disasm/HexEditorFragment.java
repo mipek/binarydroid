@@ -11,16 +11,21 @@ import android.view.ViewGroup;
 
 import net.fornwall.jelf.ElfFile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import de.thwildau.mpekar.binarydroid.R;
+import de.thwildau.mpekar.binarydroid.disasm.ByteAccessor;
 
 public class HexEditorFragment extends Fragment {
 
     private DisassemblerViewModel viewModel;
-    private ElfFile elf;
+    private File elfFile;
 
-    public static HexEditorFragment newInstance(ElfFile elf) {
+    public static HexEditorFragment newInstance(File elfFile) {
         HexEditorFragment frag = new HexEditorFragment();
-        frag.elf = elf;
+        frag.elfFile = elfFile;
         return frag;
     }
 
@@ -35,7 +40,19 @@ public class HexEditorFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(DisassemblerViewModel.class);
 
-        viewModel.setBinary(elf);
+        try {
+            ByteAccessor accessor = new ByteAccessor(elfFile);
+            viewModel.setAccessor(accessor);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ElfFile elf = ElfFile.fromFile(elfFile);
+            viewModel.setBinary(elf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

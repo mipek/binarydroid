@@ -10,18 +10,17 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import de.thwildau.mpekar.binarydroid.R;
-import de.thwildau.mpekar.binarydroid.disasm.BinaryAccessor;
+import de.thwildau.mpekar.binarydroid.disasm.ByteAccessor;
 
 public class HexEditView extends View {
-    private long cursor;
-    private BinaryAccessor accessor;
+    private long address;
+    private ByteAccessor accessor;
 
     // TODO: add properties / auto detect somehow
     private final int numberRows = 12;
 
     private int rowHeight;
 
-    private int textSize;
     private int textColor;
     private int addressColor;
     private boolean showCharacters;
@@ -37,7 +36,7 @@ public class HexEditView extends View {
                 0, 0);
 
         try {
-            textSize = a.getInt(R.styleable.HexEditView_textSize, 18);
+            //textSize = a.getInt(R.styleable.HexEditView_textSize, 18);
             textColor = a.getColor(R.styleable.HexEditView_textColor, getResources().getColor(R.color.hexbytes));
             addressColor = a.getColor(R.styleable.HexEditView_addressColor, getResources().getColor(R.color.hexaddr));
             showCharacters = a.getBoolean(R.styleable.HexEditView_showCharacters, true);
@@ -48,13 +47,21 @@ public class HexEditView extends View {
         invalidate();
     }
 
-    public int getTextSize() {
-        return textSize;
+
+    public long getAddress() {
+        return address;
     }
 
-    public void setTextSize(int textSize) {
-        this.textSize = textSize;
-        invalidate();
+    public void setAddress(long address) {
+        this.address = address;
+    }
+
+    public ByteAccessor getAccessor() {
+        return accessor;
+    }
+
+    public void setAccessor(ByteAccessor accessor) {
+        this.accessor = accessor;
     }
 
     public int getTextColor() {
@@ -124,25 +131,43 @@ public class HexEditView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        long address = getAddress();
         canvas.save();
         canvas.translate(getPaddingLeft(), getPaddingTop());
         for (int i=0; i<numberRows; ++i) {
-            drawRow(canvas);
+            drawRow(canvas, address);
             canvas.translate(0, rowHeight + 1);
+            address += 8; // 8 bytes per line
         }
         canvas.restore();
     }
 
     /// Draws a single hexview row
-    private void drawRow(Canvas canvas) {
-        int width = getWidth();
+    private byte [] buffer = new byte[8]; // 8 bytes per row
+    private void drawRow(Canvas canvas, long offset) {
+        final ByteAccessor access = getAccessor();
+        final int width = getWidth();
 
-        canvas.drawText(getMaxAddress(), 1, rowHeight, paintAddr);
-        canvas.drawText("42 42 42 42 42 42 42 42", getWidth() / 4, rowHeight, paintBytes);
+        StringBuilder displayBytes = new StringBuilder(8 * 3);
+        int bytes = access.getBytes(offset, 8, buffer);
+        for (int i=0; i<bytes; ++i) {
+            if (i != 0) {
+                displayBytes.append(' ');
+            }
+            displayBytes.append(String.format("%0X", buffer[i]));
+        }
+
+        canvas.drawText(String.format("%08X", offset), 1, rowHeight, paintAddr);
+        canvas.drawText(displayBytes.toString(), getWidth() / 4, rowHeight, paintBytes);
 
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            canvas.drawText("MZ......", getWidth() - width / 4, rowHeight, paintString);
+            StringBuilder displayChars = new StringBuilder(8 * 2);
+            for (int i=0; i<bytes; ++i) {
+                displayChars.append((char)buffer[i]);
+            }
+
+            canvas.drawText(displayChars.toString(), getWidth() - width / 4, rowHeight, paintString);
         }
     }
 
@@ -159,11 +184,11 @@ public class HexEditView extends View {
         paintAddr.setTextAlign(Paint.Align.LEFT);
 
         paintBytes.setColor(getTextColor());
-        paintBytes.setTextSize(getTextSize());
+        paintBytes.setTextSize(rowHeight);
         paintBytes.setTextAlign(Paint.Align.LEFT);
 
         paintString.setColor(Color.GRAY);
-        paintString.setTextSize(getTextSize());
+        paintString.setTextSize(rowHeight);
         paintString.setTextAlign(Paint.Align.LEFT);
     }
 }
