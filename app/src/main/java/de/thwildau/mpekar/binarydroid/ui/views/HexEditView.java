@@ -9,6 +9,8 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.nio.ByteBuffer;
+
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.disasm.ByteAccessor;
 
@@ -17,7 +19,8 @@ public class HexEditView extends View {
     private ByteAccessor accessor;
 
     // TODO: add properties / auto detect somehow
-    private final int numberRows = 12;
+    private final int numberRows = 15;
+    private static final String HEXCHARS    = "0123456789ABCDEF";
 
     private int rowHeight;
 
@@ -111,18 +114,21 @@ public class HexEditView extends View {
 
         rowHeight = height / numberRows;
 
-        int usedWidth = width / 4;
-        ViewHelper.setTextSizeForWidth(paintAddr, width / 4, getMaxAddress());
+        int usedWidth = width / 5;
+        ViewHelper.setTextSizeForWidth(paintAddr, width / 6, getMaxAddress());
 
         // enable character view in landscape mode
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             ViewHelper.setTextSizeForWidth(paintString, width / 4, "MMMMMMMM");
-            usedWidth *= 2;
+            usedWidth += width / 4;
+            showCharacters = false;//true;
+        } else {
+            showCharacters = false;
         }
 
-        final String sampleBytes = "42 42 42 42 42 42 42 42";
-        ViewHelper.setTextSizeForWidth(paintBytes, width - usedWidth, sampleBytes);
+        final String sampleBytes = "11 11 11 11 11 11 11 11";
+        ViewHelper.setTextSizeForWidth(paintBytes, width - usedWidth - getPaddingLeft() - getPaddingRight(), sampleBytes);
 
         setMeasuredDimension(width, height);
     }
@@ -130,6 +136,8 @@ public class HexEditView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        if (getAccessor() == null) return;
 
         long address = getAddress();
         canvas.save();
@@ -143,28 +151,32 @@ public class HexEditView extends View {
     }
 
     /// Draws a single hexview row
-    private byte [] buffer = new byte[8]; // 8 bytes per row
+   // private byte [] buffer = new byte[8]; // 8 bytes per row
     private void drawRow(Canvas canvas, long offset) {
         final ByteAccessor access = getAccessor();
         final int width = getWidth();
 
         StringBuilder displayBytes = new StringBuilder(8 * 3);
-        int bytes = access.getBytes(offset, 8, buffer);
-        for (int i=0; i<bytes; ++i) {
+        ByteBuffer bytes = access.getBytes(offset, 8);
+        for (int i=0; i<bytes.limit(); ++i) {
             if (i != 0) {
                 displayBytes.append(' ');
             }
-            displayBytes.append(String.format("%0X", buffer[i]));
+
+            byte value = bytes.get(i);
+            displayBytes.append(HEXCHARS.charAt((value & 0xF0) >> 4))
+                        .append(HEXCHARS.charAt(value & 0x0F));
         }
 
-        canvas.drawText(String.format("%08X", offset), 1, rowHeight, paintAddr);
-        canvas.drawText(displayBytes.toString(), getWidth() / 4, rowHeight, paintBytes);
+        String addrStr = String.format("%08X", offset);
+        canvas.drawText(addrStr, 0, rowHeight, paintAddr);
+        canvas.drawText(displayBytes.toString(), paintAddr.measureText(addrStr), rowHeight, paintBytes);
 
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (showCharacters) {
             StringBuilder displayChars = new StringBuilder(8 * 2);
-            for (int i=0; i<bytes; ++i) {
-                displayChars.append((char)buffer[i]);
+            for (int i=0; i<bytes.limit(); ++i) {
+                // we can use "getChar" because it reads two characters
+                displayChars.append((char)bytes.get(i));
             }
 
             canvas.drawText(displayChars.toString(), getWidth() - width / 4, rowHeight, paintString);

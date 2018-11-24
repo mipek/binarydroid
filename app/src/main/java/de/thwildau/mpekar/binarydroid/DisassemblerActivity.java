@@ -23,14 +23,15 @@ public class DisassemblerActivity extends AppCompatActivity {
         // Add main fragment if this is first creation
         if (savedInstanceState == null) {
             String binpath = getIntent().getStringExtra(EXTRA_BINPATH);
-            try {
-                ElfFile elf = ElfFile.fromFile(new File(binpath));
+            File file = new File(binpath);
 
+            if (file.exists()) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, HexEditorFragment.newInstance(elf))
+                        .replace(R.id.container, HexEditorFragment.newInstance(file))
                         .commitNow();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                // TODO: error msg
+                finish();
             }
         }
     }
