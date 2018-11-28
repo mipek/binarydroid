@@ -21,12 +21,12 @@ import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 import de.thwildau.mpekar.binarydroid.ui.views.HexEditView;
 
-public class HexEditorFragment extends DisasmFragment {
+public class DisassemblerFragment extends DisasmFragment {
 
     private DisassemblerViewModel viewModel;
 
-    public static HexEditorFragment newInstance() {
-        HexEditorFragment frag = new HexEditorFragment();
+    public static DisassemblerFragment newInstance() {
+        DisassemblerFragment frag = new DisassemblerFragment();
         return frag;
     }
 
@@ -41,17 +41,12 @@ public class HexEditorFragment extends DisasmFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity()).get(DisassemblerViewModel.class);
 
-        // register observer on our {@link ByteAccessor} inside the ViewModel so we can point it to the HexView
-        final HexEditorFragment me = this;
-        viewModel.getAccessorr().observe(this, new Observer<ByteAccessor>() {
+        final DisassemblerFragment me = this;
+        viewModel.getBinary().observe(this, new Observer<ElfFile>() {
             @Override
-            public void onChanged(@Nullable ByteAccessor byteAccessor) {
-                HexEditView hexView = me.getView().findViewById(R.id.hexview);
-                if (hexView != null) {
-                    hexView.setAccessor(byteAccessor);
-                } else {
-                    Log.e("BinaryDroid", "couldn't find HexView");
-                }
+            public void onChanged(@Nullable ElfFile elf) {
+                // go to entrypoint
+                viewModel.setAddress(elf.entry_point);
             }
         });
     }

@@ -14,6 +14,7 @@ import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 public class DisassemblerViewModel extends ViewModel {
     private final MutableLiveData<ElfFile> binary = new MutableLiveData<ElfFile>();
     private final MutableLiveData<ByteAccessor> accessor = new MutableLiveData<>();
+    private final MutableLiveData<Long> address = new MutableLiveData<>();
 
     public void setBinary(ElfFile item) {
         binary.setValue(item);
@@ -29,5 +30,13 @@ public class DisassemblerViewModel extends ViewModel {
 
     public LiveData<ByteAccessor> getAccessorr() {
         return accessor;
+    }
+
+    public void setAddress(long addy) {
+        address.setValue(addy);
+    }
+
+    public LiveData<Long> getAddress() {
+        return address;
     }
 }
