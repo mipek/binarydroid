@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel;
 
 import net.fornwall.jelf.ElfFile;
 
-import de.thwildau.mpekar.binarydroid.disasm.ByteAccessor;
+import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 
 /**
  * This is the main viewmodel that is shared across all disassembler related UIs.

@@ -6,24 +6,37 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
 import de.thwildau.mpekar.binarydroid.R;
-import de.thwildau.mpekar.binarydroid.disasm.ByteAccessor;
+import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 
 public class HexEditView extends View {
+    private static final int MSG_HOLD_TO_SCROLL = 1;
+    private static final String HEXCHARS    = "0123456789ABCDEF";
+
+    // variables w/ public access
     private long address;
     private ByteAccessor accessor;
 
-    // TODO: add properties / auto detect somehow
-    private final int numberRows = 15;
-    private static final String HEXCHARS    = "0123456789ABCDEF";
-
+    // variables w/ private access
     private int rowHeight;
+    private HoldToScrollHandler handler;
+    private long lastPositionUpdate;
+    private float positionY;
+    private float startY;
+    private float currentY;
+    private boolean isHolding = false;
 
+    // properties
     private int textColor;
     private int addressColor;
     private boolean showCharacters;
@@ -46,6 +59,8 @@ public class HexEditView extends View {
         } finally {
             a.recycle();
         }
+
+        handler = new HoldToScrollHandler(this);
 
         invalidate();
     }
@@ -106,13 +121,13 @@ public class HexEditView extends View {
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int desiredWidth = getResources().getDisplayMetrics().widthPixels;
-        int desiredHeight = getResources().getDisplayMetrics().heightPixels/10;
+        int desiredHeight = getResources().getDisplayMetrics().heightPixels;
         int width, height;
 
         width = ViewHelper.handleSize(widthMode, desiredWidth, widthSize);
         height = ViewHelper.handleSize(heightMode, desiredHeight, heightSize);
 
-        rowHeight = height / numberRows;
+        rowHeight = (int)(height * 0.05f);
 
         int usedWidth = width / 5;
         ViewHelper.setTextSizeForWidth(paintAddr, width / 6, getMaxAddress());
@@ -122,7 +137,7 @@ public class HexEditView extends View {
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             ViewHelper.setTextSizeForWidth(paintString, width / 4, "MMMMMMMM");
             usedWidth += width / 4;
-            showCharacters = false;//true;
+            showCharacters = true;
         } else {
             showCharacters = false;
         }
@@ -131,27 +146,76 @@ public class HexEditView extends View {
         ViewHelper.setTextSizeForWidth(paintBytes, width - usedWidth - getPaddingLeft() - getPaddingRight(), sampleBytes);
 
         setMeasuredDimension(width, height);
+        invalidate();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        final float y = event.getY();// / getHeight();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: // remember touch starting position
+                startY = y;
+                isHolding = true;
+                handler.sendEmptyMessage(MSG_HOLD_TO_SCROLL);
+                break;
+            case MotionEvent.ACTION_MOVE: // do scrolling
+                currentY = y;
+                doScroll(true);
+                break;
+            case MotionEvent.ACTION_UP:
+                isHolding = false;
+                handler.removeMessages(MSG_HOLD_TO_SCROLL);
+            default:
+                break;
+        }
+
+        // consume event
+        return true;
+    }
+
+    private void doScroll(boolean updateTimestamp) {
+        float deltaY = startY - currentY;
+        if (deltaY != 0) {
+            positionY += deltaY;
+            if (positionY < 0) {
+                positionY = 0;
+            }
+            if (updateTimestamp) {
+                lastPositionUpdate = System.currentTimeMillis();
+            }
+            invalidate();
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        //canvas.drawRect(0,0,getWidth(),getHeight(), paintString);
         if (getAccessor() == null) return;
 
+        // get start address
         long address = getAddress();
+
+        // figure out where we are at (in the file)
+        long offset = (int)(positionY / rowHeight) * 8;
+        Log.d("BinaryDroid", "delta: " + (positionY / rowHeight) + ", offset: " + offset);
+        address += offset;
+
         canvas.save();
         canvas.translate(getPaddingLeft(), getPaddingTop());
-        for (int i=0; i<numberRows; ++i) {
+        float drawY = getPaddingTop();
+        float maxY = getHeight() - getPaddingTop();
+        do {
             drawRow(canvas, address);
-            canvas.translate(0, rowHeight + 1);
+            canvas.translate(0, rowHeight);
             address += 8; // 8 bytes per line
-        }
+            drawY += rowHeight;
+        } while(drawY < maxY && address < getAccessor().getTotalBytes()); //(drawY < canvas.getHeight());
         canvas.restore();
     }
 
     /// Draws a single hexview row
-   // private byte [] buffer = new byte[8]; // 8 bytes per row
     private void drawRow(Canvas canvas, long offset) {
         final ByteAccessor access = getAccessor();
         final int width = getWidth();
@@ -203,4 +267,37 @@ public class HexEditView extends View {
         paintString.setTextSize(rowHeight);
         paintString.setTextAlign(Paint.Align.LEFT);
     }
+
+    private static class HoldToScrollHandler extends Handler {
+        private static final long HOLD_TO_SCROLL_WAIT_TIME = 880;
+        private static final long HOLD_TO_SCROLL_UPDATE_TIME = 88;
+        private final WeakReference<HexEditView> refView;
+
+        HoldToScrollHandler(HexEditView view) {
+            refView = new WeakReference<>(view);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                // Check if user is still "holding the scroll"
+                case MSG_HOLD_TO_SCROLL:
+                    holdToScroll();
+                    break;
+                default:
+                    throw new RuntimeException("handleMessage: unknown message " + msg);
+            }
+        }
+
+        private void holdToScroll() {
+            HexEditView view = refView.get();
+            if (view != null && view.isHolding) {
+                if (System.currentTimeMillis() - view.lastPositionUpdate >= HOLD_TO_SCROLL_WAIT_TIME) {
+                    view.doScroll(false);
+                }
+                // re-schedule the holdToScroll-check
+                sendEmptyMessageDelayed(MSG_HOLD_TO_SCROLL, HOLD_TO_SCROLL_UPDATE_TIME);
+            }
+        }
+    };
 }

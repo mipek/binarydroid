@@ -18,7 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import de.thwildau.mpekar.binarydroid.R;
-import de.thwildau.mpekar.binarydroid.disasm.ByteAccessor;
+import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 import de.thwildau.mpekar.binarydroid.ui.views.HexEditView;
 
 public class HexEditorFragment extends Fragment {

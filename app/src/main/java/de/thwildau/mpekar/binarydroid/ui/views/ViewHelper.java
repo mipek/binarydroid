@@ -44,6 +44,13 @@ class ViewHelper {
         paint.setTextSize(desiredTextSize);
     }
 
+    /**
+     * Handle measure spec and return size accordingly. Should be used in onMeasure
+     * @param measureSpec   measure spec (from onMeasure)
+     * @param desired       desired size
+     * @param max           maximum size
+     * @return new size value
+     */
     static int handleSize(int measureSpec, int desired, int max) {
         int size;
         if (measureSpec == View.MeasureSpec.EXACTLY) {

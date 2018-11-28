@@ -1,8 +1,5 @@
-package de.thwildau.mpekar.binarydroid.disasm;
+package de.thwildau.mpekar.binarydroid.assembly;
 
-import net.fornwall.jelf.ElfFile;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,9 +10,11 @@ import java.nio.channels.FileChannel;
 public class ByteAccessor {
     //private FileInputStream inputStream;
     private FileChannel fileChannel;
+    private long totalBytes;
     ///private ByteBuffer byteBuffer;
 
     public ByteAccessor(File f) throws FileNotFoundException {
+        totalBytes = f.length();
         FileInputStream inputStream = new FileInputStream(f);
         fileChannel = inputStream.getChannel();
     }
@@ -30,12 +29,16 @@ public class ByteAccessor {
             //inputStream.reset();
             //inputStream.skip(address);
             //return inputStream.read(out, 0, bytes);
-            int actualBytes = fileChannel.read(byteBuffer);
+            int actualBytes = fileChannel.read(byteBuffer, address);
             byteBuffer.limit(actualBytes);
             return byteBuffer;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public long getTotalBytes() {
+        return totalBytes;
     }
 }
