@@ -1,4 +1,4 @@
-package de.thwildau.mpekar.binarydroid.ui.views;
+package de.thwildau.mpekar.binarydroid.views;
 
 import android.graphics.Paint;
 import android.graphics.Rect;

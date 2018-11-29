@@ -5,21 +5,14 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.fornwall.jelf.ElfFile;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
-import de.thwildau.mpekar.binarydroid.ui.views.HexEditView;
+import de.thwildau.mpekar.binarydroid.views.HexEditView;
 
 public class HexEditorFragment extends DisasmFragment {
 
