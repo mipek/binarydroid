@@ -16,6 +16,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi', 'arm64'
+            universalApk false
+        }
+    }
 }
 
 dependencies {
@@ -29,6 +37,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.chrisplus.rootmanager:library:2.0.5@aar'
-    implementation files('src/main/jniLibs/libjnidispatch.so')
-    implementation files('src/main/jniLibs/libcapstone.so')
+    implementation files('src/main/jniLibs/arm64/libjnidispatch.so')
+    implementation files('src/main/jniLibs/arm64/libcapstone.so')
 }
