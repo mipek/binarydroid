@@ -1,0 +1,6 @@
+[submodule "capstone"]
+	path = capstone
+	url = https://github.com/aquynh/capstone.git
+[submodule "jna"]
+	path = jna
+	url = https://github.com/twall/jna.git
