@@ -77,8 +77,13 @@ public class DisassemblerActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position)
             {
-                DisasmFragment frag = (DisasmFragment)pagerAdapter.getItem(position);
-                frag.onFragmentActivate();
+                DisasmFragment newFrag = (DisasmFragment)pagerAdapter.getItem(position);
+                int currentPosition = pager.getCurrentItem();
+                if (currentPosition >= 0) {
+                    DisasmFragment oldFrag = (DisasmFragment) pagerAdapter.getItem(currentPosition);
+                    oldFrag.onChangeFragment(false);
+                }
+                newFrag.onChangeFragment(true);
             }
 
             @Override
@@ -97,7 +102,7 @@ public class DisassemblerActivity extends AppCompatActivity {
             super(fm);
             fragments = new DisasmFragment[NUM_VIEWS];
             fragments[0] = new HexEditorFragment();
-            fragments[1] = new DisasmFragment();
+            fragments[1] = new DisassemblerFragment();
         }
 
         @Override

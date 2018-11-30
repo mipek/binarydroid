@@ -17,6 +17,7 @@ import de.thwildau.mpekar.binarydroid.views.HexEditView;
 public class HexEditorFragment extends DisasmFragment {
 
     private DisassemblerViewModel viewModel;
+    private HexEditView hexView;
 
     public static HexEditorFragment newInstance() {
         HexEditorFragment frag = new HexEditorFragment();
@@ -26,7 +27,10 @@ public class HexEditorFragment extends DisasmFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.hexed_fragment, container, false);
+        View v = inflater.inflate(R.layout.hexed_fragment, container, false);
+        hexView = v.findViewById(R.id.hexview);
+        assert hexView != null;
+        return v;
     }
 
     @Override
@@ -39,14 +43,13 @@ public class HexEditorFragment extends DisasmFragment {
         viewModel.getAccessorr().observe(this, new Observer<ByteAccessor>() {
             @Override
             public void onChanged(@Nullable ByteAccessor byteAccessor) {
-                HexEditView hexView = me.getView().findViewById(R.id.hexview);
-                if (hexView != null) {
-                    hexView.setAccessor(byteAccessor);
-                } else {
-                    Log.e("BinaryDroid", "couldn't find HexView");
-                }
+                hexView.setAccessor(byteAccessor);
             }
         });
     }
 
+    @Override
+    public void onChangeFragment(boolean isActive) {
+        hexView.setEnabled(isActive);
+    }
 }
