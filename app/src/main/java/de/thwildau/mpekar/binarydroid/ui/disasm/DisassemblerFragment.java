@@ -14,11 +14,13 @@ import net.fornwall.jelf.ElfFile;
 
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.assembly.DisassemblerCapstone;
+import de.thwildau.mpekar.binarydroid.model.Container;
+import de.thwildau.mpekar.binarydroid.views.DisasmView;
 
 public class DisassemblerFragment extends DisasmFragment {
 
     private DisassemblerViewModel viewModel;
-    private TextView tv;
+    private DisasmView disasm;
 
     public static DisassemblerFragment newInstance() {
         DisassemblerFragment frag = new DisassemblerFragment();
@@ -29,7 +31,7 @@ public class DisassemblerFragment extends DisasmFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.disasm_fragment, container, false);
-        tv = v.findViewById(R.id.textView);
+        disasm = v.findViewById(R.id.disasm);
         return v;
     }
 
@@ -38,25 +40,26 @@ public class DisassemblerFragment extends DisasmFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity()).get(DisassemblerViewModel.class);
 
-        final DisassemblerFragment me = this;
-        viewModel.getBinary().observe(this, new Observer<ElfFile>() {
-            @Override
-            public void onChanged(@Nullable ElfFile elf) {
-                // go to entrypoint
-                viewModel.setAddress(elf.entry_point);
+        disasm.setViewModel(viewModel);
 
-                StringBuilder test = new StringBuilder();
+        final DisassemblerFragment me = this;
+        viewModel.getBinary().observe(this, new Observer<Container>() {
+            @Override
+            public void onChanged(@Nullable Container elf) {
+                // go to entrypoint
+                viewModel.setAddress(elf.getEntryPoint());
+
+                /*StringBuilder test = new StringBuilder();
                 DisassemblerCapstone disasm = new DisassemblerCapstone();
                 long addy = viewModel.getAddress().getValue();
                 for (int i = 0; i < 8; ++i) {
-                    String line = disasm.disassemble(viewModel.getAccessorr().getValue(), addy);
+                    String line = disasm.disassemble(viewModel.getAccessor().getValue(), addy);
                     test.append(line);
                     test.append('\n');
                     addy += 4;
                 }
-                tv.setText(test.toString());
+                tv.setText(test.toString());*/
             }
         });
     }
-
 }

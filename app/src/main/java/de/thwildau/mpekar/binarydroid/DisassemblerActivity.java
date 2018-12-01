@@ -17,6 +17,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
+import de.thwildau.mpekar.binarydroid.assembly.DisassemblerCapstone;
+import de.thwildau.mpekar.binarydroid.model.Container;
+import de.thwildau.mpekar.binarydroid.model.ContainerELF;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisasmFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
@@ -42,6 +45,8 @@ public class DisassemblerActivity extends AppCompatActivity {
                 DisassemblerViewModel viewModel =
                         ViewModelProviders.of(this).get(DisassemblerViewModel.class);
 
+                viewModel.setDisasm(new DisassemblerCapstone());
+
                 try {
                     ByteAccessor accessor = new ByteAccessor(file);
                     viewModel.setAccessor(accessor);
@@ -52,7 +57,7 @@ public class DisassemblerActivity extends AppCompatActivity {
 
                 try {
                     ElfFile elf = ElfFile.fromFile(file);
-                    viewModel.setBinary(elf);
+                    viewModel.setBinary(new ContainerELF(elf));
                 } catch (IOException e) {
                     e.printStackTrace(); //TODO: proper handling
                     finish();

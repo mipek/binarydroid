@@ -81,6 +81,9 @@ public class BinaryListViewModel extends ViewModel {
 
                             Log.d("BinaryDroid", " Bin: " + binary);
 
+                            // DEBUG
+                            if (!binary.contains("libil2cpp")) continue;
+
                             BinaryFile binaryFile =
                                     new BinaryFile(packageName, arch, binary, randomColor);
                             outList.add(binaryFile);

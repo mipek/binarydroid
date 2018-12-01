@@ -17,35 +17,30 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
 import de.thwildau.mpekar.binarydroid.R;
+import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
+import de.thwildau.mpekar.binarydroid.model.Architectures;
+import de.thwildau.mpekar.binarydroid.model.Container;
+import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 
-public class HexEditView extends View {
-    private static final int MSG_HOLD_TO_SCROLL = 1;
-    private static final String HEXCHARS    = "0123456789ABCDEF";
-
+public class HexEditView extends ScrollableView {
     // variables w/ public access
     private long address;
-    private ByteAccessor accessor;
+    private DisassemblerViewModel vm;
 
     // variables w/ private access
     private int rowHeight;
-    private HoldToScrollHandler handler;
-    private long lastPositionUpdate;
-    private float positionY;
-    private float startY;
-    private float currentY;
-    private boolean isHolding = false;
+    private boolean showCharacters;
 
     // properties
     private int textColor;
     private int addressColor;
-    private boolean showCharacters;
     private Paint paintAddr;
     private Paint paintBytes;
     private Paint paintString;
 
     public HexEditView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        super(context, attrs, false, true);
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
                 R.styleable.HexEditView,
@@ -55,12 +50,10 @@ public class HexEditView extends View {
             //textSize = a.getInt(R.styleable.HexEditView_textSize, 18);
             textColor = a.getColor(R.styleable.HexEditView_textColor, getResources().getColor(R.color.hexbytes));
             addressColor = a.getColor(R.styleable.HexEditView_addressColor, getResources().getColor(R.color.hexaddr));
-            showCharacters = a.getBoolean(R.styleable.HexEditView_showCharacters, true);
+            showCharacters = a.getBoolean(R.styleable.HexEditView_showCharacters, false);
         } finally {
             a.recycle();
         }
-
-        handler = new HoldToScrollHandler(this);
 
         invalidate();
     }
@@ -74,12 +67,12 @@ public class HexEditView extends View {
         this.address = address;
     }
 
-    public ByteAccessor getAccessor() {
-        return accessor;
+    public DisassemblerViewModel getVm() {
+        return vm;
     }
 
-    public void setAccessor(ByteAccessor accessor) {
-        this.accessor = accessor;
+    public void setVm(DisassemblerViewModel vm) {
+        this.vm = vm;
     }
 
     public int getTextColor() {
@@ -99,19 +92,31 @@ public class HexEditView extends View {
         invalidate();
     }
 
-    public boolean isShowCharacters() {
-        return showCharacters;
-    }
-
-    public void setShowCharacters(boolean showCharacters) {
-        this.showCharacters = showCharacters;
-        invalidate();
-        requestLayout();
-    }
-
+    // Return max address for this architecture.
     private String getMaxAddress() {
-        // TODO: support 64bit architectures
-        return "ffffffff";
+        switch (getVm().getBinary().getValue().getArch()) {
+            case ARM64:
+            case AMD64:
+                return "ffffffffffffffff";
+            case ARM:
+            case X86:
+                return "ffffffff";
+            default:
+                throw new RuntimeException("unknown arch");
+        }
+    }
+
+    // Tests whether or not the view has a viewmodel & accessor
+    private boolean isReady() {
+        return (getVm() != null && getVm().getAccessor() != null);
+    }
+
+    private ByteAccessor getAccessor() {
+        return getVm().getAccessor().getValue();
+    }
+
+    private long getTotalBytes() {
+        return getAccessor().getTotalBytes();
     }
 
     @Override
@@ -150,56 +155,18 @@ public class HexEditView extends View {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        final float y = event.getY();// / getHeight();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: // remember touch starting position
-                startY = y;
-                isHolding = true;
-                handler.sendEmptyMessage(MSG_HOLD_TO_SCROLL);
-                break;
-            case MotionEvent.ACTION_MOVE: // do scrolling
-                currentY = y;
-                doScroll(true);
-                break;
-            case MotionEvent.ACTION_UP:
-                isHolding = false;
-                handler.removeMessages(MSG_HOLD_TO_SCROLL);
-            default:
-                break;
-        }
-
-        // consume event
-        return true;
-    }
-
-    private void doScroll(boolean updateTimestamp) {
-        float deltaY = startY - currentY;
-        if (deltaY != 0) {
-            positionY += deltaY;
-            if (positionY < 0) {
-                positionY = 0;
-            }
-            if (updateTimestamp) {
-                lastPositionUpdate = System.currentTimeMillis();
-            }
-            invalidate();
-        }
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         //canvas.drawRect(0,0,getWidth(),getHeight(), paintString);
-        if (getAccessor() == null) return;
+        if (!isReady()) return;
 
         // get start address
         long address = getAddress();
 
         // figure out where we are at (in the file)
-        long offset = (int)(positionY / rowHeight) * 8;
-        Log.d("BinaryDroid", "delta: " + (positionY / rowHeight) + ", offset: " + offset);
+        long offset = (int)(getPositionY() / rowHeight) * 8;
+        Log.d("BinaryDroid", "delta: " + (getPositionY() / rowHeight) + ", offset: " + offset);
         address += offset;
 
         canvas.save();
@@ -211,7 +178,7 @@ public class HexEditView extends View {
             canvas.translate(0, rowHeight);
             address += 8; // 8 bytes per line
             drawY += rowHeight;
-        } while(drawY < maxY && address < getAccessor().getTotalBytes()); //(drawY < canvas.getHeight());
+        } while(drawY < maxY && address < getTotalBytes()); //(drawY < canvas.getHeight());
         canvas.restore();
     }
 
@@ -228,11 +195,11 @@ public class HexEditView extends View {
             }
 
             byte value = bytes.get(i);
-            displayBytes.append(HEXCHARS.charAt((value & 0xF0) >> 4))
-                        .append(HEXCHARS.charAt(value & 0x0F));
+            Utils.b2s(displayBytes, value);
         }
 
-        String addrStr = String.format("%08X", offset);
+        byte wordSize = getVm().getBinary().getValue().getWordSize();
+        String addrStr = Utils.l2s(offset, wordSize);//String.format("%08X", offset);
         canvas.drawText(addrStr, 0, rowHeight, paintAddr);
         canvas.drawText(displayBytes.toString(), paintAddr.measureText(addrStr), rowHeight, paintBytes);
 
@@ -267,37 +234,4 @@ public class HexEditView extends View {
         paintString.setTextSize(rowHeight);
         paintString.setTextAlign(Paint.Align.LEFT);
     }
-
-    private static class HoldToScrollHandler extends Handler {
-        private static final long HOLD_TO_SCROLL_WAIT_TIME = 880;
-        private static final long HOLD_TO_SCROLL_UPDATE_TIME = 88;
-        private final WeakReference<HexEditView> refView;
-
-        HoldToScrollHandler(HexEditView view) {
-            refView = new WeakReference<>(view);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                // Check if user is still "holding the scroll"
-                case MSG_HOLD_TO_SCROLL:
-                    holdToScroll();
-                    break;
-                default:
-                    throw new RuntimeException("handleMessage: unknown message " + msg);
-            }
-        }
-
-        private void holdToScroll() {
-            HexEditView view = refView.get();
-            if (view != null && view.isHolding) {
-                if (System.currentTimeMillis() - view.lastPositionUpdate >= HOLD_TO_SCROLL_WAIT_TIME) {
-                    view.doScroll(false);
-                }
-                // re-schedule the holdToScroll-check
-                sendEmptyMessageDelayed(MSG_HOLD_TO_SCROLL, HOLD_TO_SCROLL_UPDATE_TIME);
-            }
-        }
-    };
 }

@@ -1,5 +1,10 @@
 package de.thwildau.mpekar.binarydroid.assembly;
 
 public interface Disassembler {
-    String disassemble(ByteAccessor accessor, long address);
+    Instruction [] disassemble(ByteAccessor accessor, long address, int bytes);
+
+    interface Instruction {
+        short size();
+        boolean isReturn();
+    }
 }

@@ -7,20 +7,24 @@ import android.arch.lifecycle.ViewModel;
 import net.fornwall.jelf.ElfFile;
 
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
+import de.thwildau.mpekar.binarydroid.assembly.Disassembler;
+import de.thwildau.mpekar.binarydroid.model.Container;
 
 /**
  * This is the main viewmodel that is shared across all disassembler related UIs.
  */
 public class DisassemblerViewModel extends ViewModel {
-    private final MutableLiveData<ElfFile> binary = new MutableLiveData<ElfFile>();
+    private final MutableLiveData<Container> binary = new MutableLiveData<Container>();
     private final MutableLiveData<ByteAccessor> accessor = new MutableLiveData<>();
     private final MutableLiveData<Long> address = new MutableLiveData<>();
+    private final MutableLiveData<Disassembler> disasm = new MutableLiveData<>();
+    private final MutableLiveData<Integer> fontSizeDisasm = new MutableLiveData<>();
 
-    public void setBinary(ElfFile item) {
+    public void setBinary(Container item) {
         binary.setValue(item);
     }
 
-    public LiveData<ElfFile> getBinary() {
+    public LiveData<Container> getBinary() {
         return binary;
     }
 
@@ -28,7 +32,7 @@ public class DisassemblerViewModel extends ViewModel {
         accessor.setValue(ac);
     }
 
-    public LiveData<ByteAccessor> getAccessorr() {
+    public LiveData<ByteAccessor> getAccessor() {
         return accessor;
     }
 
@@ -38,5 +42,21 @@ public class DisassemblerViewModel extends ViewModel {
 
     public LiveData<Long> getAddress() {
         return address;
+    }
+
+    public LiveData<Disassembler> getDisasm() {
+        return disasm;
+    }
+
+    public void setDisasm(Disassembler d) {
+        disasm.setValue(d);
+    }
+
+    public void setDisassemblerFontSize(int addy) {
+        fontSizeDisasm.setValue(addy);
+    }
+
+    public LiveData<Integer> getDisassemblerFontSize() {
+        return fontSizeDisasm;
     }
 }

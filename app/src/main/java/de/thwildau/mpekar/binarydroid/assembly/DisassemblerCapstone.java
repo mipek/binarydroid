@@ -1,35 +1,78 @@
 package de.thwildau.mpekar.binarydroid.assembly;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import capstone.Capstone;
 
 public class DisassemblerCapstone implements Disassembler {
-    Capstone cs;
+    private static Capstone cs;
 
-    void DisassemblerCapstone() {
-
-    }
 
     @Override
-    public String disassemble(ByteAccessor accessor, long address) {
-        ByteBuffer buf = accessor.getBytes(address, 4);
+    public Instruction [] disassemble(ByteAccessor accessor, long address, int size) {
+        ByteBuffer buf = accessor.getBytes(address, size);
 
         if (cs == null) {
             cs = new Capstone(Capstone.CS_ARCH_ARM, Capstone.CS_MODE_ARM);
         }
-        Capstone.CsInsn[] insns = cs.disasm(buf.array(), buf.limit());
-        return stringifyInstruction(insns);
+
+        Capstone.CsInsn[] capInsns = cs.disasm(buf.array(), buf.limit());
+        InstructionCapstone[] insns = new InstructionCapstone[capInsns.length];
+        for (int i=0; i<insns.length; ++i) {
+            insns[i] = new InstructionCapstone(capInsns[i]);
+        }
+        return insns;
     }
 
-    private String stringifyInstruction(Capstone.CsInsn[] insns)
-    {
-        StringBuilder builder = new StringBuilder();
-        for(Capstone.CsInsn insn: insns) {
+    private class InstructionCapstone implements Instruction {
+        private Capstone.CsInsn insn;
+
+        public InstructionCapstone(Capstone.CsInsn insn) {
+            this.insn = insn;
+        }
+
+        @Override
+        public short size() {
+            return insn.size;
+        }
+
+        @Override
+        public boolean isReturn() {
+            // TODO: we can probably get something out of opinfo (like EIP being modified)
+            // ARM branch
+            final byte [] branch = fromHexString("C7 FC FF EA");
+            final byte [] ldmfd = fromHexString("70 8C BD E8");
+
+            if (isEqual(insn.bytes, branch))
+                return true;
+            if (isEqual(insn.bytes, ldmfd))
+                return true;
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
             builder.append(insn.mnemonic);
             builder.append(' ');
             builder.append(insn.opStr);
+            return builder.toString();
         }
-        return builder.toString();
+    }
+
+    private static boolean isEqual(byte [] a, byte []b ){
+        if (a.length != b.length) return false;
+        for (int i=0; i<a.length; ++i) {
+            if (a[i] != b[i])
+                return false;
+        }
+        return true;
+    }
+
+    public static byte[] fromHexString(String src) {
+        byte[] biBytes = new BigInteger("10" + src.replaceAll("\\s", ""), 16).toByteArray();
+        return Arrays.copyOfRange(biBytes, 1, biBytes.length);
     }
 }
