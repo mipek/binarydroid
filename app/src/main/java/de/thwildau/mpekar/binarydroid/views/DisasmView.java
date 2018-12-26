@@ -1,14 +1,12 @@
 package de.thwildau.mpekar.binarydroid.views;
 
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.annotation.Nullable;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
 
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
@@ -22,6 +20,7 @@ public class DisasmView extends ScrollableView {
     private Paint paintAddr;
     private Paint paintText;
     private Container.Section currentSection;
+    private float rowHeight;
 
     public DisasmView(Context context, AttributeSet attrs) {
         super(context, attrs, false, true);
@@ -65,6 +64,10 @@ public class DisasmView extends ScrollableView {
 
         setMeasuredDimension(width, height);
         invalidate();
+
+        Rect r = new Rect();
+        paintText.getTextBounds("sample", 0, 6, r);
+        rowHeight = r.bottom;
     }
 
     @Override
@@ -99,6 +102,8 @@ public class DisasmView extends ScrollableView {
         long address = viewModel.getAddress().getValue();
         float drawY = getPaddingTop();
         float maxY = getHeight() - getPaddingTop();
+        long offset = (int)(getPositionY() / rowHeight) * 4;
+        address += offset;
         do {
             Disassembler.Instruction[] insns = d.disassemble(getAccessor(), address, 4); //TODO: don't rely on "bytes" if we want to support x86
             Disassembler.Instruction insn;
