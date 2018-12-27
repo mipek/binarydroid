@@ -105,29 +105,36 @@ public class DisassemblerActivity extends AppCompatActivity
                 ViewModelProviders.of(this).get(DisassemblerViewModel.class);
 
         viewModel.setAddress(item.addr);
+
+        // change active view to disassembler
+        pager.setCurrentItem(DisassemblerPagerAdapter.VIEW_DISASM);
     }
 
     private class DisassemblerPagerAdapter extends FragmentStatePagerAdapter {
-        private static final int NUM_VIEWS = 3;
         private DisasmFragment[] fragments;
+
+        public static final int VIEW_TOTAL_COUNT = 3;
+        public static final int VIEW_HEXEDIT = 0;
+        public static final int VIEW_DISASM = 1;
+        public static final int VIEW_SYMBOLS = 2;
 
         public DisassemblerPagerAdapter(FragmentManager fm) {
             super(fm);
-            fragments = new DisasmFragment[NUM_VIEWS];
-            fragments[0] = new HexEditorFragment();
-            fragments[1] = new DisassemblerFragment();
-            fragments[2] = new SymbolFragment();
+            fragments = new DisasmFragment[VIEW_TOTAL_COUNT];
+            fragments[VIEW_HEXEDIT] = new HexEditorFragment();
+            fragments[VIEW_DISASM] = new DisassemblerFragment();
+            fragments[VIEW_SYMBOLS] = new SymbolFragment();
         }
 
         @Override
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return fragments[0];
+                    return fragments[VIEW_HEXEDIT];
                 case 1:
-                    return fragments[1];
+                    return fragments[VIEW_DISASM];
                 case 2:
-                    return fragments[2];
+                    return fragments[VIEW_SYMBOLS];
                 default:
                     throw new RuntimeException("unknown position " + position);
             }
