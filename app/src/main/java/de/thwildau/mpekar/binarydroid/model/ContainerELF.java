@@ -2,6 +2,7 @@ package de.thwildau.mpekar.binarydroid.model;
 
 import net.fornwall.jelf.ElfFile;
 import net.fornwall.jelf.ElfSection;
+import net.fornwall.jelf.ElfSymbol;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +55,31 @@ public class ContainerELF implements Container {
             }
         }
         return sections;
+    }
+
+    @Override
+    public List<SymbolItem> getSymbols() {
+        try {
+            ElfSection section = elfFile.getDynamicSymbolTableSection();
+            if (section == null) return new ArrayList<>();
+
+            int symbolCount = section.getNumberOfSymbols();
+            List<SymbolItem> symbols = new ArrayList<>(symbolCount);
+            for (int i=0; i<symbolCount; ++i) {
+                ElfSymbol elfSymbol = section.getELFSymbol(i);
+                final String name = elfSymbol.getName();
+
+                // no point in adding empty symbols or symbols that do not point anywhere
+                if (name != null && name.length() > 0 && elfSymbol.value > 0) {
+                    symbols.add(new SymbolItem(name, elfSymbol.value));
+                }
+            }
+
+            return symbols;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

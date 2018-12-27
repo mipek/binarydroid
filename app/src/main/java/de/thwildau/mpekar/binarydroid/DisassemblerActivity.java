@@ -1,6 +1,5 @@
 package de.thwildau.mpekar.binarydroid;
 
-import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import net.fornwall.jelf.ElfFile;
 
@@ -18,14 +16,16 @@ import java.io.IOException;
 
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 import de.thwildau.mpekar.binarydroid.assembly.DisassemblerCapstone;
-import de.thwildau.mpekar.binarydroid.model.Container;
 import de.thwildau.mpekar.binarydroid.model.ContainerELF;
+import de.thwildau.mpekar.binarydroid.model.SymbolItem;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisasmFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 import de.thwildau.mpekar.binarydroid.ui.disasm.HexEditorFragment;
+import de.thwildau.mpekar.binarydroid.ui.disasm.SymbolFragment;
 
-public class DisassemblerActivity extends AppCompatActivity {
+public class DisassemblerActivity extends AppCompatActivity
+        implements SymbolFragment.OnSymbolSelectListener {
     public static final String EXTRA_BINPATH = "extra_binpath";
 
     private ViewPager pager;
@@ -99,8 +99,16 @@ public class DisassemblerActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onSymbolSelected(SymbolItem item) {
+        DisassemblerViewModel viewModel =
+                ViewModelProviders.of(this).get(DisassemblerViewModel.class);
+
+        viewModel.setAddress(item.addr);
+    }
+
     private class DisassemblerPagerAdapter extends FragmentStatePagerAdapter {
-        private static final int NUM_VIEWS = 2;
+        private static final int NUM_VIEWS = 3;
         private DisasmFragment[] fragments;
 
         public DisassemblerPagerAdapter(FragmentManager fm) {
@@ -108,6 +116,7 @@ public class DisassemblerActivity extends AppCompatActivity {
             fragments = new DisasmFragment[NUM_VIEWS];
             fragments[0] = new HexEditorFragment();
             fragments[1] = new DisassemblerFragment();
+            fragments[2] = new SymbolFragment();
         }
 
         @Override
@@ -117,6 +126,8 @@ public class DisassemblerActivity extends AppCompatActivity {
                     return fragments[0];
                 case 1:
                     return fragments[1];
+                case 2:
+                    return fragments[2];
                 default:
                     throw new RuntimeException("unknown position " + position);
             }

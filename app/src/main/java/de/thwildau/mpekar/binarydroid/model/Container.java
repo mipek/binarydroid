@@ -6,6 +6,7 @@ public interface Container {
     Architectures getArch();
     long getEntryPoint();
     List<Section> getSections();
+    List<SymbolItem> getSymbols();
     String getName();
     byte getWordSize();
 

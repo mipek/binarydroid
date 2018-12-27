@@ -8,12 +8,8 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import net.fornwall.jelf.ElfFile;
 
 import de.thwildau.mpekar.binarydroid.R;
-import de.thwildau.mpekar.binarydroid.assembly.DisassemblerCapstone;
 import de.thwildau.mpekar.binarydroid.model.Container;
 import de.thwildau.mpekar.binarydroid.views.DisasmView;
 
@@ -61,5 +57,10 @@ public class DisassemblerFragment extends DisasmFragment {
                 tv.setText(test.toString());*/
             }
         });
+    }
+
+    @Override
+    public void onChangeFragment(boolean isActive) {
+        disasm.setEnabled(isActive);
     }
 }
