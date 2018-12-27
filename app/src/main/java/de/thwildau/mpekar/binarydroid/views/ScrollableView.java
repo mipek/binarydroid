@@ -109,11 +109,16 @@ public class ScrollableView extends View {
         private void holdToScroll() {
             ScrollableView view = refView.get();
             if (view != null && view.isHolding) {
-                if (System.currentTimeMillis() - view.lastPositionUpdate >= HOLD_TO_SCROLL_WAIT_TIME) {
-                    view.doScroll(false);
+                if (view.isEnabled()) {
+                    if (System.currentTimeMillis() - view.lastPositionUpdate >= HOLD_TO_SCROLL_WAIT_TIME) {
+                        view.doScroll(false);
+                    }
+                    // re-schedule the holdToScroll-check
+                    sendEmptyMessageDelayed(MSG_HOLD_TO_SCROLL, HOLD_TO_SCROLL_UPDATE_TIME);
+                } else {
+                    // forcefully release when view is disabled
+                    view.isHolding = false;
                 }
-                // re-schedule the holdToScroll-check
-                sendEmptyMessageDelayed(MSG_HOLD_TO_SCROLL, HOLD_TO_SCROLL_UPDATE_TIME);
             }
         }
     }
