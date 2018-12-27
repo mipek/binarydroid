@@ -46,6 +46,10 @@ public class ScrollableView extends View {
         return positionY;
     }
 
+    protected void setPositionY(float positionY) {
+        this.positionY = positionY;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         final float y = event.getY();// / getHeight();
@@ -72,15 +76,25 @@ public class ScrollableView extends View {
 
     private void doScroll(boolean updateTimestamp) {
         float deltaY = startY - currentY;
-        if (deltaY != 0) {
-            positionY += deltaY;
-            if (positionY < 0) {
-                positionY = 0;
+        final float minimumScrollHeight = getHeight() / 6;
+        if (Math.abs(deltaY) >= minimumScrollHeight) {
+            float newPosY = positionY + deltaY;
+            if (newPosY < 0) {
+                newPosY = 0;
             }
+            setPositionY(newPosY);
             if (updateTimestamp) {
                 lastPositionUpdate = System.currentTimeMillis();
             }
             invalidate();
+        }
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (!enabled) {
+            isHolding = false;
         }
     }
 

@@ -92,7 +92,17 @@ public class DisasmView extends ScrollableView {
         paintText.setTextAlign(Paint.Align.LEFT);
     }
 
+    @Override
+    protected void setPositionY(float positionY) {
+        super.setPositionY(positionY);
 
+        long offset = (int)(positionY / rowHeight) * 4;
+        long newAddress = viewModel.getAddress().getValue() + offset;
+        if (newAddress < 0) {
+            newAddress = 0;
+        }
+        viewModel.setAddress(newAddress);
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -100,10 +110,8 @@ public class DisasmView extends ScrollableView {
 
         Disassembler d = viewModel.getDisasm().getValue();
         long address = viewModel.getAddress().getValue();
-        float drawY = getPaddingTop();
+        float drawY = getPaddingTop() + rowHeight*4;
         float maxY = getHeight() - getPaddingTop();
-        long offset = (int)(getPositionY() / rowHeight) * 4;
-        address += offset;
         do {
             Disassembler.Instruction[] insns = d.disassemble(getAccessor(), address, 4); //TODO: don't rely on "bytes" if we want to support x86
             Disassembler.Instruction insn;
