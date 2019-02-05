@@ -6,20 +6,14 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
-import de.thwildau.mpekar.binarydroid.model.Architectures;
 import de.thwildau.mpekar.binarydroid.model.Container;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 
@@ -94,7 +88,11 @@ public class HexEditView extends ScrollableView {
 
     // Return max address for this architecture.
     private String getMaxAddress() {
-        switch (getVm().getBinary().getValue().getArch()) {
+        Container c = getVm().getBinary().getValue();
+        if  (c == null) return "ffffffff";
+        if  (c == null) return "ffffffff";
+
+        switch (c.getArch()) {
             case ARM64:
             case AMD64:
                 return "ffffffffffffffff";
@@ -132,23 +130,27 @@ public class HexEditView extends ScrollableView {
         width = ViewHelper.handleSize(widthMode, desiredWidth, widthSize);
         height = ViewHelper.handleSize(heightMode, desiredHeight, heightSize);
 
-        rowHeight = (int)(height * 0.05f);
-
-        int usedWidth = width / 5;
+        int padding = 200;
+        int usedWidth = width / 6;
         ViewHelper.setTextSizeForWidth(paintAddr, width / 6, getMaxAddress());
 
-        // enable character view in landscape mode
+        // enable ASCII character view in landscape mode
         int orientation = getResources().getConfiguration().orientation;
+        String sampleBytes;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ViewHelper.setTextSizeForWidth(paintString, width / 4, "MMMMMMMM");
-            usedWidth += width / 4;
+            rowHeight = (int)(height / 10);
             showCharacters = true;
-        } else {
-            showCharacters = false;
-        }
+            sampleBytes = "11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11";
 
-        final String sampleBytes = "11 11 11 11 11 11 11 11";
-        ViewHelper.setTextSizeForWidth(paintBytes, width - usedWidth - getPaddingLeft() - getPaddingRight(), sampleBytes);
+            int textWidth = width / 6;
+            ViewHelper.setTextSizeForWidth(paintString, textWidth, "MMMMMMMM");
+            usedWidth += textWidth;
+        } else {
+            rowHeight = (int)(height / 20);// * 0.05f);
+            showCharacters = false;
+            sampleBytes = "11 11 11 11 11 11 11 11";
+        }
+        ViewHelper.setTextSizeForWidth(paintBytes, width - usedWidth, sampleBytes);
 
         setMeasuredDimension(width, height);
         invalidate();
@@ -160,13 +162,14 @@ public class HexEditView extends ScrollableView {
 
         //canvas.drawRect(0,0,getWidth(),getHeight(), paintString);
         if (!isReady()) return;
+        if (getAccessor() == null) return;
 
         // get start address
         long address = getAddress();
 
         // figure out where we are at (in the file)
         long offset = (int)(getPositionY() / rowHeight) * 8;
-        Log.d("BinaryDroid", "delta: " + (getPositionY() / rowHeight) + ", offset: " + offset);
+        Log.d("BinaryDroid", "scroll delta: " + (getPositionY() / rowHeight) + ", offset: " + offset);
         address += offset;
 
         canvas.save();
@@ -187,8 +190,18 @@ public class HexEditView extends ScrollableView {
         final ByteAccessor access = getAccessor();
         final int width = getWidth();
 
-        StringBuilder displayBytes = new StringBuilder(8 * 3);
-        ByteBuffer bytes = access.getBytes(offset, 8);
+        byte wordSize = getVm().getBinary().getValue().getWordSize();
+        int bytesPerLine = 8;
+        if (showCharacters) {
+            bytesPerLine = 16;
+        }
+
+        // Draw address
+        String addrStr = Utils.l2s(offset, wordSize);
+        canvas.drawText(addrStr, 0, rowHeight, paintAddr);
+
+        StringBuilder displayBytes = new StringBuilder(bytesPerLine * 3);
+        ByteBuffer bytes = access.getBytes(offset, bytesPerLine);
         for (int i=0; i<bytes.limit(); ++i) {
             if (i != 0) {
                 displayBytes.append(' ');
@@ -198,19 +211,20 @@ public class HexEditView extends ScrollableView {
             Utils.b2s(displayBytes, value);
         }
 
-        byte wordSize = getVm().getBinary().getValue().getWordSize();
-        String addrStr = Utils.l2s(offset, wordSize);//String.format("%08X", offset);
-        canvas.drawText(addrStr, 0, rowHeight, paintAddr);
-        canvas.drawText(displayBytes.toString(), paintAddr.measureText(addrStr), rowHeight, paintBytes);
+        // Draw bytes
+        canvas.drawText(
+                displayBytes.toString(),
+                paintAddr.measureText(addrStr), rowHeight, paintBytes);
 
+        // Draw ASCII characters (when required to do so)
         if (showCharacters) {
-            StringBuilder displayChars = new StringBuilder(8 * 2);
+            StringBuilder displayChars = new StringBuilder(bytesPerLine * 2);
             for (int i=0; i<bytes.limit(); ++i) {
                 // we can use "getChar" because it reads two characters
                 displayChars.append((char)bytes.get(i));
             }
 
-            canvas.drawText(displayChars.toString(), getWidth() - width / 4, rowHeight, paintString);
+            canvas.drawText(displayChars.toString(), getWidth() - width / 6, rowHeight, paintString);
         }
     }
 

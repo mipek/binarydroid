@@ -147,7 +147,7 @@ public class DisasmView extends ScrollableView {
     }*/
 
     private boolean isReady() {
-        return viewModel != null && viewModel.getBinary() != null;
+        return viewModel != null && viewModel.getBinary() != null && viewModel.getAddress() != null;
     }
 
     private ByteAccessor getAccessor() {

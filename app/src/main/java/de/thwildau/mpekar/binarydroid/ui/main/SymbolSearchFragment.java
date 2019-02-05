@@ -57,10 +57,6 @@ public class SymbolSearchFragment extends Fragment {
             }
         });
         limitSearchApps.callOnClick(); // properly initialize application list state
-
-        // Retain fragment instance (so we don't lose CheckBox values in our RecyclerView)
-        setRetainInstance(true);
-
         return view;
     }
 
