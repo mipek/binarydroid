@@ -5,4 +5,6 @@
     <color name="colorAccent">#D81B60</color>
     <color name="hexaddr">#3ac2eb</color>
     <color name="hexbytes">#424242</color>
+    <color name="applistbg">#ebebeb</color>
+    <color name="applist_disabled">#788a8a8a</color>
 </resources>

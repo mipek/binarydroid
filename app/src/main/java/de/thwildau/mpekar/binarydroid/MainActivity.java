@@ -14,6 +14,7 @@ import android.util.Log;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.ui.main.BinaryListFragment;
 import de.thwildau.mpekar.binarydroid.ui.main.FileBrowserFragment;
+import de.thwildau.mpekar.binarydroid.ui.main.SymbolSearchFragment;
 
 public class MainActivity extends AppCompatActivity implements BinaryListFragment.InteractionListener {
     MainPagerAdapter pagerAdapter;
@@ -86,12 +87,14 @@ public class MainActivity extends AppCompatActivity implements BinaryListFragmen
     private class MainPagerAdapter extends FragmentPagerAdapter {
         private BinaryListFragment binaryListFragment;
         private FileBrowserFragment fileBrowserFragment;
+        private SymbolSearchFragment symbolSearchFragment;
 
         public MainPagerAdapter(FragmentManager fm) {
             super(fm);
 
             binaryListFragment = new BinaryListFragment();
             fileBrowserFragment = new FileBrowserFragment();
+            symbolSearchFragment = new SymbolSearchFragment();
         }
 
         @Override
@@ -101,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements BinaryListFragmen
                     return binaryListFragment;
                 case 1:
                     return fileBrowserFragment;
+                case 2:
+                    return symbolSearchFragment;
                 default:
                     return null;
             }
@@ -113,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements BinaryListFragmen
                     return resources.getString(R.string.tab_installedapps);
                 case 1:
                     return resources.getString(R.string.tab_filebrowser);
+                case 2:
+                    return resources.getString(R.string.tab_symbolsearch);
                 default:
                     throw new IllegalArgumentException("position is out of range");
             }
@@ -120,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements BinaryListFragmen
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
     }
 }

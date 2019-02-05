@@ -5,4 +5,11 @@
     <string name="filebrowser_browserbtn">Browser</string>
     <string name="tab_installedapps">Installed Apps</string>
     <string name="tab_filebrowser">File Browser</string>
+    <string name="tab_symbolsearch">Symbol search</string>
+    <string name="chk_regexsyntax">Regex syntax</string>
+    <string name="chk_ignorecase">Ignore case</string>
+    <string name="chk_limitsearch">Limit search to selected applications</string>
+    <string name="hint_symbolid">Symbol identifier</string>
+    <string name="appicon">Application Icon</string>
+    <string name="startsymbolsearch">Start search</string>
 </resources>
