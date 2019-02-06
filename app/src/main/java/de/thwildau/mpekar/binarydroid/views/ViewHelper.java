@@ -30,7 +30,7 @@ class ViewHelper {
         // more accurate results, but may cause problems with hardware
         // acceleration. But there are workarounds for that, too; refer to
         // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
-        final float testTextSize = 28f;
+        final float testTextSize = 42f;
 
         // Get the bounds of the text, using our testTextSize.
         paint.setTextSize(testTextSize);
@@ -61,21 +61,5 @@ class ViewHelper {
             size = desired;
         }
         return size;
-    }
-
-    static float calculateMaxTextSize(String text, Paint paint, int maxWidth, int maxHeight) {
-        if (text == null || paint == null) return 0;
-        Rect bound = new Rect();
-        float size = 1.0f;
-        float step= 1.0f;
-        while (true) {
-            paint.getTextBounds(text, 0, text.length(), bound);
-            if (bound.width() < maxWidth && bound.height() < maxHeight) {
-                size += step;
-                paint.setTextSize(size);
-            } else {
-                return size - step;
-            }
-        }
     }
 }

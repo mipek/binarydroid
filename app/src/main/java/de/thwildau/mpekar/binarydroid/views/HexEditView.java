@@ -88,8 +88,10 @@ public class HexEditView extends ScrollableView {
 
     // Return max address for this architecture.
     private String getMaxAddress() {
+        if  (getVm() == null) return "ffffffff";
+        if  (getVm().getBinary() == null) return "ffffffff";
+
         Container c = getVm().getBinary().getValue();
-        if  (c == null) return "ffffffff";
         if  (c == null) return "ffffffff";
 
         switch (c.getArch()) {
@@ -130,27 +132,14 @@ public class HexEditView extends ScrollableView {
         width = ViewHelper.handleSize(widthMode, desiredWidth, widthSize);
         height = ViewHelper.handleSize(heightMode, desiredHeight, heightSize);
 
-        int padding = 200;
-        int usedWidth = width / 6;
-        ViewHelper.setTextSizeForWidth(paintAddr, width / 6, getMaxAddress());
-
-        // enable ASCII character view in landscape mode
         int orientation = getResources().getConfiguration().orientation;
-        String sampleBytes;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            rowHeight = (int)(height / 10);
+            rowHeight = height / 10;
             showCharacters = true;
-            sampleBytes = "11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11";
-
-            int textWidth = width / 6;
-            ViewHelper.setTextSizeForWidth(paintString, textWidth, "MMMMMMMM");
-            usedWidth += textWidth;
         } else {
-            rowHeight = (int)(height / 20);// * 0.05f);
+            rowHeight = height / 20;// * 0.05f);
             showCharacters = false;
-            sampleBytes = "11 11 11 11 11 11 11 11";
         }
-        ViewHelper.setTextSizeForWidth(paintBytes, width - usedWidth, sampleBytes);
 
         setMeasuredDimension(width, height);
         invalidate();
@@ -237,15 +226,32 @@ public class HexEditView extends ScrollableView {
         paintString = new Paint();
 
         paintAddr.setColor(getAddressColor());
-        paintAddr.setTextSize(rowHeight);
+        //paintAddr.setTextSize(rowHeight);
         paintAddr.setTextAlign(Paint.Align.LEFT);
 
         paintBytes.setColor(getTextColor());
-        paintBytes.setTextSize(rowHeight);
+        //paintBytes.setTextSize(rowHeight);
         paintBytes.setTextAlign(Paint.Align.LEFT);
 
         paintString.setColor(Color.GRAY);
-        paintString.setTextSize(rowHeight);
+        //paintString.setTextSize(rowHeight);
         paintString.setTextAlign(Paint.Align.LEFT);
+
+        // Figure out how big our text will be using placeholder text.
+        final int width = getWidth();
+        int usedWidth = width / 6;
+        ViewHelper.setTextSizeForWidth(paintAddr, width / 6, getMaxAddress());
+
+        String sampleBytes = "11 11 11 11 11 11 11 11";
+        if (showCharacters) {
+            sampleBytes = "11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11";
+
+            Log.d("BinaryDroid", "invalidate() paintString");
+            int textWidth = width / 6;
+            ViewHelper.setTextSizeForWidth(paintString, textWidth, "WWWWWWWW");
+            usedWidth += textWidth;
+        }
+        ViewHelper.setTextSizeForWidth(paintBytes, width - usedWidth, sampleBytes);
+        Log.d("BinaryDroid", "Recalculated HexView text size");
     }
 }

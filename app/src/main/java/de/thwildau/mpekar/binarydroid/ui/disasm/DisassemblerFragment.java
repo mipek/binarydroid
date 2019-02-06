@@ -61,6 +61,8 @@ public class DisassemblerFragment extends DisasmFragment {
 
     @Override
     public void onChangeFragment(boolean isActive) {
-        disasm.setEnabled(isActive);
+        if (disasm != null) {
+            disasm.setEnabled(isActive);
+        }
     }
 }

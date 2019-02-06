@@ -38,6 +38,18 @@ public class ScrollableView extends View {
         }
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        this.isHolding = false;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        this.isHolding = false;
+    }
+
     /**
      * Returns the current position / scroll offset.
      * @return  current scroll offset
