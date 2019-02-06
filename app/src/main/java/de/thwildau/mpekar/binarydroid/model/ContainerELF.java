@@ -40,7 +40,7 @@ public class ContainerELF implements Container {
     @Override
     public List<Section> getSections() {
         if (sections == null) {
-            List<Section> sections = new ArrayList<>();
+            sections = new ArrayList<>(elfFile.num_sh);
             try {
                 for (int i = 0; i < elfFile.num_sh; i++) {
                     ElfSection sh = elfFile.getSection(i);
@@ -49,6 +49,8 @@ public class ContainerELF implements Container {
                     s.name = sh.getName();
                     s.va = sh.address;
                     s.raw = sh.section_offset;
+                    s.size = sh.size;
+                    sections.add(s);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

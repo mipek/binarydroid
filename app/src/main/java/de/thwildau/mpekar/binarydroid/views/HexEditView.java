@@ -87,23 +87,25 @@ public class HexEditView extends ScrollableView {
     }
 
     // Return max address for this architecture.
+    // This is used as a hint for the text size calculations
+    // (we use max value to figure out correct size)
     private String getMaxAddress() {
-        if  (getVm() == null) return "ffffffff";
-        if  (getVm().getBinary() == null) return "ffffffff";
-
-        Container c = getVm().getBinary().getValue();
-        if  (c == null) return "ffffffff";
-
-        switch (c.getArch()) {
-            case ARM64:
-            case AMD64:
-                return "ffffffffffffffff";
-            case ARM:
-            case X86:
-                return "ffffffff";
-            default:
-                throw new RuntimeException("unknown arch");
+        if (getVm() != null && getVm().getBinary() != null) {
+            Container c = getVm().getBinary().getValue();
+            if (c != null) {
+                switch (c.getArch()) {
+                    case ARM64:
+                    case AMD64:
+                        return "ffffffffffffffff";
+                    case ARM:
+                    case X86:
+                        return "ffffffff";
+                    default:
+                        throw new RuntimeException("unknown arch");
+                }
+            }
         }
+        return "";
     }
 
     // Tests whether or not the view has a viewmodel & accessor
@@ -246,7 +248,6 @@ public class HexEditView extends ScrollableView {
         if (showCharacters) {
             sampleBytes = "11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11";
 
-            Log.d("BinaryDroid", "invalidate() paintString");
             int textWidth = width / 6;
             ViewHelper.setTextSizeForWidth(paintString, textWidth, "WWWWWWWW");
             usedWidth += textWidth;

@@ -13,6 +13,9 @@ public class DisassemblerCapstone implements Disassembler {
     @Override
     public Instruction [] disassemble(ByteAccessor accessor, long address, int size) {
         ByteBuffer buf = accessor.getBytes(address, size);
+        if (buf == null) {
+            return new InstructionCapstone[0];
+        }
 
         if (cs == null) {
             cs = new Capstone(Capstone.CS_ARCH_ARM, Capstone.CS_MODE_ARM);

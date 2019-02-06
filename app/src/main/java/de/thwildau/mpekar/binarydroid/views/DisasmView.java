@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
@@ -109,14 +108,18 @@ public class DisasmView extends ScrollableView {
         if (!isReady()) return;
 
         Disassembler d = viewModel.getDisasm().getValue();
-        long address = viewModel.getAddress().getValue();
+        Long address = viewModel.getAddress().getValue();
+        if (address == null) return;
+
         float drawY = getPaddingTop() + rowHeight*4;
         float maxY = getHeight() - getPaddingTop();
         do {
-            Disassembler.Instruction[] insns = d.disassemble(getAccessor(), address, 4); //TODO: don't rely on "bytes" if we want to support x86
+            //TODO: don't rely on a fixed instruction size if we want to support x86
+            final int instructionSize = 4;
+            Disassembler.Instruction[] insns = d.disassemble(getAccessor(), address, instructionSize);
             Disassembler.Instruction insn;
-            String tmp = String.format("disasm %x got %d insn", address, insns.length);
-            Log.d("BinaryDroid", tmp);
+            //String tmp = String.format("disasm %x got %d insn", address, insns.length);
+            //Log.d("BinaryDroid", tmp);
             if (insns.length > 1) {
                 throw new RuntimeException("unexpected insn count");
             } else if (insns.length == 1) {
@@ -147,7 +150,9 @@ public class DisasmView extends ScrollableView {
     }*/
 
     private boolean isReady() {
-        return viewModel != null && viewModel.getBinary() != null && viewModel.getAddress() != null;
+        return viewModel != null &&
+                viewModel.getBinary() != null &&
+                viewModel.getAddress() != null;
     }
 
     private ByteAccessor getAccessor() {

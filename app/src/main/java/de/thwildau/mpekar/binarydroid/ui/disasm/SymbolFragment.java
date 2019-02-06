@@ -63,7 +63,7 @@ public class SymbolFragment extends DisasmFragment {
             @Override
             public void onChanged(@Nullable Container elf) {
                 SymbolRecyclerViewAdapter adapter = (SymbolRecyclerViewAdapter) recyclerView.getAdapter();
-                adapter.setValues(elf.getSymbols());
+                adapter.setValues(elf.getSections(), elf.getSymbols());
             }
         });
     }

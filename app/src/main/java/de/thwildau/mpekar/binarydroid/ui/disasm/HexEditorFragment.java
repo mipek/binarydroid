@@ -1,6 +1,5 @@
 package de.thwildau.mpekar.binarydroid.ui.disasm;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import de.thwildau.mpekar.binarydroid.R;
-import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 import de.thwildau.mpekar.binarydroid.views.HexEditView;
 
 public class HexEditorFragment extends DisasmFragment {
@@ -51,6 +49,8 @@ public class HexEditorFragment extends DisasmFragment {
 
     @Override
     public void onChangeFragment(boolean isActive) {
-        hexView.setEnabled(isActive);
+        if (hexView != null) {
+            hexView.setEnabled(isActive);
+        }
     }
 }

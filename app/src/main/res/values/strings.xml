@@ -12,4 +12,5 @@
     <string name="hint_symbolid">Symbol identifier</string>
     <string name="appicon">Application Icon</string>
     <string name="startsymbolsearch">Start search</string>
+    <string name="nosection">Symbol does not point within a section.</string>
 </resources>

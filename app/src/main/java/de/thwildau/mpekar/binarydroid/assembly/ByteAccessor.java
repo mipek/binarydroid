@@ -30,6 +30,9 @@ public class ByteAccessor {
             //inputStream.skip(address);
             //return inputStream.read(out, 0, bytes);
             int actualBytes = fileChannel.read(byteBuffer, address);
+            if (actualBytes == -1) {
+                return null;
+            }
             byteBuffer.limit(actualBytes);
             return byteBuffer;
         } catch (IOException e) {
