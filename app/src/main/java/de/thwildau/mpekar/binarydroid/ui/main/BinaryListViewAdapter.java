@@ -1,17 +1,19 @@
 package de.thwildau.mpekar.binarydroid.ui.main;
 
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.List;
 
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
-import de.thwildau.mpekar.binarydroid.ui.main.BinaryListFragment.InteractionListener;
-
-import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link BinaryFile} and makes a call to the
@@ -46,17 +48,33 @@ public class BinaryListViewAdapter extends RecyclerView.Adapter<BinaryListViewAd
         final BinaryFile binaryFile = appList.get(position);
         holder.binaryFile = binaryFile;
 
+        // Sometimes there will be a number appended after the package name.
+        // We don't want that so just trim it off
+        String packageName = binaryFile.getPackageName();
+        int i = packageName.lastIndexOf("-");
+        if (i > 0) {
+            packageName = packageName.substring(0, i);
+        }
+
         holder.container.setBackgroundColor(binaryFile.getColor());
-        holder.packageName.setText(binaryFile.getPackageName());
+        holder.packageName.setText(packageName);
         holder.architecture.setText(binaryFile.getArch());
         holder.binary.setText(binaryFile.getBinary());
+
+        try {
+            Drawable applicationIcon = holder.icon.getContext().
+                    getPackageManager().getApplicationIcon(packageName);
+            holder.icon.setImageDrawable(applicationIcon);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Notify the listener (if any)
                 if (null != mListener) {
-                    mListener.onListFragmentInteraction(binaryFile);
+                    mListener.onSelectBinaryFile(binaryFile);
                 }
             }
         });
@@ -72,6 +90,7 @@ public class BinaryListViewAdapter extends RecyclerView.Adapter<BinaryListViewAd
         public BinaryFile binaryFile;
 
         public final ConstraintLayout container;
+        public final ImageView icon;
         public final TextView packageName;
         public final TextView architecture;
         public final TextView binary;
@@ -81,6 +100,7 @@ public class BinaryListViewAdapter extends RecyclerView.Adapter<BinaryListViewAd
             this.view = view;
 
             container = view.findViewById(R.id.bin);
+            icon = view.findViewById(R.id.applisticon);
             packageName = view.findViewById(R.id.packageName);
             architecture = view.findViewById(R.id.arch);
             binary = view.findViewById(R.id.binary);

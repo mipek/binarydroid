@@ -14,9 +14,10 @@ import android.util.Log;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.ui.main.BinaryListFragment;
 import de.thwildau.mpekar.binarydroid.ui.main.FileBrowserFragment;
+import de.thwildau.mpekar.binarydroid.ui.main.InteractionListener;
 import de.thwildau.mpekar.binarydroid.ui.main.SymbolSearchFragment;
 
-public class MainActivity extends AppCompatActivity implements BinaryListFragment.InteractionListener {
+public class MainActivity extends AppCompatActivity implements InteractionListener {
     MainPagerAdapter pagerAdapter;
     ViewPager pager;
 
@@ -78,9 +79,14 @@ public class MainActivity extends AppCompatActivity implements BinaryListFragmen
     }
 
     @Override
-    public void onListFragmentInteraction(BinaryFile item) {
+    public void onSelectBinaryFile(BinaryFile item) {
+        onSelectFilePath(item.buildPath());
+    }
+
+    @Override
+    public void onSelectFilePath(String filePath) {
         Intent intent = new Intent(this, DisassemblerActivity.class);
-        intent.putExtra(DisassemblerActivity.EXTRA_BINPATH, item.buildPath());
+        intent.putExtra(DisassemblerActivity.EXTRA_BINPATH, filePath);
         startActivity(intent);
     }
 

@@ -13,4 +13,5 @@
     <string name="appicon">Application Icon</string>
     <string name="startsymbolsearch">Start search</string>
     <string name="nosection">Symbol does not point within a section.</string>
+    <string name="packageiconstr">Package icon</string>
 </resources>

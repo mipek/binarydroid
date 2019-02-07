@@ -82,11 +82,4 @@ public class BinaryListFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-    /**
-     * This interface provides to ability to interact with other fragments/activities.
-     */
-    public interface InteractionListener {
-        void onListFragmentInteraction(BinaryFile item);
-    }
 }

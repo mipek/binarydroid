@@ -39,7 +39,6 @@ public class BinaryListViewModel extends ViewModel {
                 String[] apps = r.getMessage().split("\n");
                 for (String packageName: apps) {
                     packageName = sanitizeFileName(packageName);
-
                     loadAppBinaries(packageName, binaries);
                 }
 
@@ -82,7 +81,7 @@ public class BinaryListViewModel extends ViewModel {
                             Log.d("BinaryDroid", " Bin: " + binary);
 
                             // DEBUG
-                            if (!binary.contains("libil2cpp")) continue;
+                           // if (!binary.contains("libil2cpp")) continue;
 
                             BinaryFile binaryFile =
                                     new BinaryFile(packageName, arch, binary, randomColor);

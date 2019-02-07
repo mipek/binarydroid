@@ -1,5 +1,6 @@
 package de.thwildau.mpekar.binarydroid.ui.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import static android.app.Activity.RESULT_OK;
 public class FileBrowserFragment extends Fragment {
     private static final int BROWSER_REQUEST_CODE = 1337;
     private EditText filePath;
+    private InteractionListener listener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,7 +39,13 @@ public class FileBrowserFragment extends Fragment {
         view.findViewById(R.id.btnopen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO:
+                if (listener != null) {
+                    String path = filePath.getText().toString();
+                    File f = new File(path);
+                    if (f.exists()) {
+                        listener.onSelectFilePath(path);
+                    }
+                }
             }
         });
         return view;
@@ -55,6 +63,17 @@ public class FileBrowserFragment extends Fragment {
                 Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof InteractionListener) {
+            listener = (InteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement InteractionListener");
         }
     }
 }

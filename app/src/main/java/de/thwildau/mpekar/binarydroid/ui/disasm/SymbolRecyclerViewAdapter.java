@@ -58,9 +58,11 @@ public class SymbolRecyclerViewAdapter extends RecyclerView.Adapter<SymbolRecycl
 
     // Return the section the symbol points to
     private Container.Section getSymbolSection(SymbolItem symbol) {
-        for (Container.Section section: this.sections) {
-            if (symbol.addr >= section.va && symbol.addr < (section.va + section.size)) {
-                return section;
+        if (this.sections != null) {
+            for (Container.Section section : this.sections) {
+                if (symbol.addr >= section.va && symbol.addr < (section.va + section.size)) {
+                    return section;
+                }
             }
         }
         return null;
