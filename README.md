@@ -16,9 +16,9 @@ It currently uses Capstone for disassembling under the hood.
 
 ## Dependencies
 This application utilizes the following open-source libraries:
-- Capstone
-- jelf
-- RootManager
+- [Capstone](https://github.com/aquynh/capstone)
+- [jelf](https://github.com/fornwall/jelf)
+- [RootManager](https://github.com/Chrisplus/RootManager)
 
 ## Todo
 I have a couple of things in mind that would be cool to add in future:
