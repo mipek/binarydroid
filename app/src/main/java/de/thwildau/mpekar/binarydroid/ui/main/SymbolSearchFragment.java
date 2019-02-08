@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,13 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chrisplus.rootmanager.RootManager;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.SymbolSearcher;
@@ -38,13 +36,14 @@ import static de.thwildau.mpekar.binarydroid.MainActivity.ALLOWROOT_DENY;
 import static de.thwildau.mpekar.binarydroid.MainActivity.ALLOWROOT_GRANT;
 import static de.thwildau.mpekar.binarydroid.MainActivity.PERF_ALLOWROOT;
 
-public class SymbolSearchFragment extends Fragment {
+public class SymbolSearchFragment extends Fragment implements SymbolSearchInterface {
     RecyclerView recyclerView;
     LinearLayoutManager layoutManager;
     CheckBox ignoreCase;
     CheckBox regexSyntax;
     CheckBox limitSearchApps;
     View appListDisabledOverlay;
+    Set<String> selectedApps;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,12 +55,14 @@ public class SymbolSearchFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        recyclerView.setAdapter(new AppListAdapter());
+        recyclerView.setAdapter(new SymbolSearchAppListAdapter(this));
 
         appListDisabledOverlay = view.findViewById(R.id.applist_disabled);
         ignoreCase = view.findViewById(R.id.ignoreCase);
         regexSyntax = view.findViewById(R.id.regexSyntax);
         limitSearchApps = view.findViewById(R.id.limitSearch);
+
+        // We enable/disable the application list based on the state of the checkbox above it.
         limitSearchApps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,13 +75,14 @@ public class SymbolSearchFragment extends Fragment {
                     final RecyclerView.ViewHolder holder =
                             recyclerView.getChildViewHolder(recyclerView.getChildAt(i));
                     if (holder != null) {
-                        ((ViewHolder) holder).setEnabled(isAppListVisible);
+                        ((SymbolSearchAppListAdapter.ViewHolder) holder).setEnabled(isAppListVisible);
                     }
                 }
             }
         });
-        limitSearchApps.callOnClick(); // properly initialize application list state
+        limitSearchApps.callOnClick(); // properly initialize application list starting state
 
+        // "start search" button functionality
         final TextView searchString = view.findViewById(R.id.searchView);
         final Button startSearch = view.findViewById(R.id.btnstartsearch);
         startSearch.setOnClickListener(new View.OnClickListener() {
@@ -109,12 +111,31 @@ public class SymbolSearchFragment extends Fragment {
                         }
                     });
                 } else {
+                    // We already asked the user about the SU permission thing; start the search
                     startSearch(symbolName);
                 }
             }
         });
 
         return view;
+    }
+
+    // Returns a set of all application package names that are selected/filtered.
+    private Set<String> getSelectedApps() {
+        HashSet<String> set = new HashSet<>();
+
+        if (limitSearchApps.isChecked()) {
+            SymbolSearchAppListAdapter adapter = (SymbolSearchAppListAdapter) recyclerView.getAdapter();
+            for (int i = 0; i < adapter.getItemCount(); ++i) {
+                FilteredAppInfo appInfo = adapter.getItemByIndex(i);
+
+                // If this application is checked we have to add it to our set.
+                if (appInfo.checked) {
+                    set.add(appInfo.packageName);
+                }
+            }
+        }
+        return set;
     }
 
     private void startSearch(final String symbolName) {
@@ -124,6 +145,7 @@ public class SymbolSearchFragment extends Fragment {
         BinaryListViewModel vm = ViewModelProviders.of(getActivity()).get(BinaryListViewModel.class);
         final List<BinaryFile> binaries = vm.getBinaries().getValue();
         if (binaries != null && binaries.size() > 0) {
+            final SymbolSearchFragment myself = this;
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -133,20 +155,7 @@ public class SymbolSearchFragment extends Fragment {
                             ignoreCase.isChecked());
 
                     // Register the search progress listener
-                    symbolSearcher.setListener(new SymbolSearchInterface() {
-                        @Override
-                        public void onSymbolMatch(BinaryFile binary, SymbolItem symbolItem) {
-                            Log.d("BinaryDroid", "Symbol match: " + symbolItem.toString());
-                        }
-
-                        @Override
-                        public boolean shouldSkipApp(String packageName) {
-                            if (limitSearchApps.isChecked()) {
-                                // TODO: add support for search limiting
-                            }
-                            return false;
-                        }
-                    });
+                    symbolSearcher.setListener(myself);
                     symbolSearcher.search(symbolName);
                 }
             });
@@ -155,75 +164,46 @@ public class SymbolSearchFragment extends Fragment {
         }
     }
 
-    private class AppListAdapter extends RecyclerView.Adapter {
-        private List<ApplicationInfo> appList;
-
-        AppListAdapter() {
-            appList = getContext().getPackageManager().
-                    getInstalledApplications(PackageManager.GET_META_DATA);
-        }
-
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_symbolsearch_appentry, parent, false);
-            return new ViewHolder(view, false);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-            ViewHolder vh = (ViewHolder)holder;
-            vh.setAppInfo(appList.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return appList.size();
-        }
+    @Override
+    public void onSearchStarted() {
+        // Update selected/filtered app list cache
+        selectedApps = getSelectedApps();
+        Log.d("BinaryDroid", "Starting symbol search");
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public View view;
-        private ImageView appIcon;
-        private TextView appName;
-        private CheckBox checker;
+    @Override
+    public void onSymbolMatch(BinaryFile binary, SymbolItem symbolItem) {
+        Log.d("BinaryDroid", "Symbol match: " + symbolItem.toString());
+    }
 
-        public ViewHolder(View view, boolean checkerState) {
-            super(view);
-            this.view = view;
+    @Override
+    public void onSearchComplete(int symbolCount) {
+        Log.d("BinaryDroid", "Symbol search finished, symbolCount=" + symbolCount);
+    }
 
-            appIcon = view.findViewById(R.id.appIcon);
-            appName = view.findViewById(R.id.appName);
-            checker = view.findViewById(R.id.appChecker);
-            checker.setChecked(checkerState);
+    @Override
+    public boolean shouldSkipApp(String packageName) {
+        if (limitSearchApps.isChecked()) {
+            // We use our cached app list to ensure we're O(1)
+            return !selectedApps.contains(packageName);
+        }
+        return false;
+    }
 
-            View.OnClickListener checkBoxTrampoline = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (checker.isEnabled()) {
-                        checker.setChecked(!checker.isChecked());
-                    }
-                }
-            };
+    static class FilteredAppInfo extends ApplicationInfo {
+        private boolean checked;
 
-            // "redirect" every click event to the checkbox
-            appIcon.setOnClickListener(checkBoxTrampoline);
-            appName.setOnClickListener(checkBoxTrampoline);
-            view.setOnClickListener(checkBoxTrampoline);
+        FilteredAppInfo(ApplicationInfo applicationInfo, boolean checked) {
+            super(applicationInfo);
+            this.checked = checked;
         }
 
-        public void setAppInfo(ApplicationInfo appInfo) {
-            PackageManager packageManager = getContext().getPackageManager();
-            Drawable icon = packageManager.getApplicationIcon(appInfo);
-            CharSequence label = packageManager.getApplicationLabel(appInfo);
-
-            appIcon.setImageDrawable(icon);
-            appName.setText(label);
+        public boolean isChecked() {
+            return checked;
         }
 
-        public void setEnabled(boolean enabled) {
-            checker.setEnabled(enabled);
+        public void setChecked(boolean checked) {
+            this.checked = checked;
         }
     }
 }

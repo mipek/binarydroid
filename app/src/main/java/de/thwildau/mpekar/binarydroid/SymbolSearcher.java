@@ -52,6 +52,8 @@ public class SymbolSearcher {
             symbolName = symbolName.toLowerCase();
         }
 
+        listener.onSearchStarted();
+
         // Take a look at every binary file
         int symbolCount = 0;
         for (BinaryFile binary: binaries) {

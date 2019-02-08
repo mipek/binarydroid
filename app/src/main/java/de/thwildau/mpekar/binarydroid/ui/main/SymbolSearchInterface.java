@@ -5,8 +5,14 @@ import de.thwildau.mpekar.binarydroid.model.SymbolItem;
 
 /**
  * Provides the link between the background search process and the frontend.
+ * @note Calls to the interface are executed from a background thread.
  */
 public interface SymbolSearchInterface {
+    /**
+     * Called when a search has been started,
+     */
+    void onSearchStarted();
+
     /**
      * Called for every symbol that matches
      * @param binary            Binary that contains the symbol
