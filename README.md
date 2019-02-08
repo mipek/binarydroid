@@ -21,8 +21,8 @@ This application utilizes the following open-source libraries:
 - [RootManager](https://github.com/Chrisplus/RootManager)
 
 ## Todo
-I have a couple of things in mind that would be cool to add in future:
-- Add support for different "Container types" (ie. not just ELF files but PE files too)
+I have a couple of things in mind that would be cool to add in future versions:
+- Add support for different "container types" (ie. not just ELF files but PE files too)
 - Improve architecture support (add x86, mips, ....)
 - Implement mode switching (ARM and Thumb) - should be easy enough given that we use Capstone
 - Graph-View disassembler (as seen in IDA or x64dbg)

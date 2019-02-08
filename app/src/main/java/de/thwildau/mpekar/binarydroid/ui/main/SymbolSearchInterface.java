@@ -1,5 +1,7 @@
 package de.thwildau.mpekar.binarydroid.ui.main;
 
+import java.io.Serializable;
+
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;
 
@@ -15,10 +17,9 @@ public interface SymbolSearchInterface {
 
     /**
      * Called for every symbol that matches
-     * @param binary            Binary that contains the symbol
-     * @param symbolItem        Found symbol
+     * @param result            Object that contains the binary and symbol
      */
-    void onSymbolMatch(BinaryFile binary, SymbolItem symbolItem);
+    void onSymbolMatch(ResultEntry result);
 
     /**
      * Called after the search is finished.
@@ -33,4 +34,14 @@ public interface SymbolSearchInterface {
      * @return                  True to skip this app, false to do a search in it.
      */
     boolean shouldSkipApp(String packageName);
+
+    class ResultEntry implements Serializable {
+        public final BinaryFile binary;
+        public final SymbolItem symbol;
+
+        public ResultEntry(BinaryFile binary, SymbolItem symbol) {
+            this.binary = binary;
+            this.symbol = symbol;
+        }
+    }
 }

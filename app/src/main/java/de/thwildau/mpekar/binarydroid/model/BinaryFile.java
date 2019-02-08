@@ -1,9 +1,11 @@
 package de.thwildau.mpekar.binarydroid.model;
 
+import java.io.Serializable;
+
 /**
  * Encapsulates a binary that is located somewhere on the device
  */
-public class BinaryFile {
+public class BinaryFile implements Serializable {
     private String packageName;
     private String arch;
     private String binary;

@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.os.AsyncTask;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 
 import com.chrisplus.rootmanager.RootManager;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +32,6 @@ import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.SymbolSearcher;
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
-import de.thwildau.mpekar.binarydroid.model.SymbolItem;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 import static de.thwildau.mpekar.binarydroid.MainActivity.ALLOWROOT_DENY;
@@ -46,6 +47,7 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
     Button startSearch;
     View appListDisabledOverlay;
     Set<String> selectedApps;
+    ArrayList<ResultEntry> searchResults;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -177,17 +179,21 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
             public void run() {
                 // Disable the button while a search is currently in progress
                 startSearch.setEnabled(false);
+                startSearch.setText(R.string.searchingsymbol);
             }
         });
 
         // Update selected/filtered app list cache
         selectedApps = getSelectedApps();
+        // Create search result list
+        searchResults = new ArrayList<>();
         Log.d("BinaryDroid", "Starting symbol search");
     }
 
     @Override
-    public void onSymbolMatch(BinaryFile binary, SymbolItem symbolItem) {
-        Log.d("BinaryDroid", "Symbol match: " + symbolItem.toString());
+    public void onSymbolMatch(ResultEntry result) {
+        searchResults.add(result);
+        Log.d("BinaryDroid", "Symbol match: " + result.symbol.toString());
     }
 
     @Override
@@ -198,6 +204,12 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
             public void run() {
                 // Disable the button while a search is currently in progress
                 startSearch.setEnabled(true);
+                startSearch.setText(R.string.startsymbolsearch);
+
+                // Show results in a new activity
+                Intent intent = new Intent(getActivity(), SymbolSearchResultActivity.class);
+                intent.putExtra(SymbolSearchResultActivity.EXTRA_RESULTS, searchResults);
+                startActivity(intent);
             }
         });
 

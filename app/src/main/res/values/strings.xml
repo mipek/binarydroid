@@ -21,4 +21,5 @@
     <string name="rootreq">Root request</string>
     <string name="couldntgetsymbols">Failed to fetch symbols of current file</string>
     <string name="binarynotexists">Binary file does not exists!</string>
+    <string name="searchingsymbol">Searching..</string>
 </resources>

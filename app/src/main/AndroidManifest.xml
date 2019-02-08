@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisassemblerActivity"/>
+        <activity android:name=".ui.main.SymbolSearchResultActivity"/>
     </application>
 
 </manifest>

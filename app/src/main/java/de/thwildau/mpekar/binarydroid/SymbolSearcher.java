@@ -70,7 +70,7 @@ public class SymbolSearcher {
                 for (SymbolItem symbol: symbols) {
                     // Check symbol name
                     if (compareSymbol(symbolName, symbol)) {
-                        listener.onSymbolMatch(binary, symbol);
+                        listener.onSymbolMatch(new SymbolSearchInterface.ResultEntry(binary, symbol));
                         ++symbolCount;
                     }
                 }
