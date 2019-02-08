@@ -14,4 +14,9 @@
     <string name="startsymbolsearch">Start search</string>
     <string name="nosection">Symbol does not point within a section.</string>
     <string name="packageiconstr">Package icon</string>
+    <string name="rootrequired">You need to grant root access in order to use this functionality.</string>
+    <string name="rootaccept">Accept</string>
+    <string name="rootmsg">In order to use this functionality this application requires superuser access.</string>
+    <string name="rootdeny">Deny</string>
+    <string name="rootreq">Root request</string>
 </resources>

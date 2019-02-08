@@ -3,6 +3,7 @@ package de.thwildau.mpekar.binarydroid.ui.main;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,9 +12,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.List;
 
+import de.thwildau.mpekar.binarydroid.MainActivity;
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 
@@ -25,6 +29,9 @@ import de.thwildau.mpekar.binarydroid.model.BinaryFile;
  */
 public class BinaryListFragment extends Fragment {
     private InteractionListener mListener;
+    private TextView rootInfo;
+    private Button rootRequest;
+    private RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -47,10 +54,43 @@ public class BinaryListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_applist_list, container, false);
 
-        // Set the adapter via our view model
-        if (view instanceof RecyclerView) {
-            final RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        rootInfo = view.findViewById(R.id.rootrequiredlabel);
+        rootRequest = view.findViewById(R.id.rootreq);
+        recyclerView = view.findViewById(R.id.list);
+
+        final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        // Kick this off to initialize the scene
+        onRootAccessChange(preferences);
+
+        // Add root request button that triggers the messagebox
+        rootRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.showRootRequestDialog(getActivity(), preferences);
+                onRootAccessChange(preferences);
+            }
+        });
+
+        return view;
+    }
+
+    private void onRootAccessChange(SharedPreferences preferences) {
+        int allowRootState = preferences.getInt(MainActivity.PERF_ALLOWROOT, MainActivity.ALLOWROOT_DENY);
+        if (allowRootState != MainActivity.ALLOWROOT_GRANT) {
+            // Hide root required message and request button if access was already granted.
+            rootInfo.setVisibility(View.VISIBLE);
+            rootRequest.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            // Root granted, only show the RecyclerView
+            rootInfo.setVisibility(View.GONE);
+            rootRequest.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+
+            // Set the adapter via our view model.
+            // This will ask the system for SU permission
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
             BinaryListViewModel vm = ViewModelProviders.of(this).get(BinaryListViewModel.class);
 
@@ -62,7 +102,6 @@ public class BinaryListFragment extends Fragment {
                 }
             });
         }
-        return view;
     }
 
 

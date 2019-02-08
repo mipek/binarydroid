@@ -1,7 +1,10 @@
 package de.thwildau.mpekar.binarydroid;
 
 import android.app.ActionBar;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.ui.main.BinaryListFragment;
@@ -17,7 +19,14 @@ import de.thwildau.mpekar.binarydroid.ui.main.FileBrowserFragment;
 import de.thwildau.mpekar.binarydroid.ui.main.InteractionListener;
 import de.thwildau.mpekar.binarydroid.ui.main.SymbolSearchFragment;
 
+import static android.content.DialogInterface.BUTTON_POSITIVE;
+
 public class MainActivity extends AppCompatActivity implements InteractionListener {
+    public static final String PERF_ALLOWROOT = "allowroot";
+    public static final int ALLOWROOT_UNSPECIFIED = 0;
+    public static final int ALLOWROOT_DENY = 1;
+    public static final int ALLOWROOT_GRANT = 2;
+
     MainPagerAdapter pagerAdapter;
     ViewPager pager;
 
@@ -27,10 +36,9 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
         setContentView(R.layout.main_activity);
 
         System.setProperty("jna.debug_load.jna", "true");
-        Log.d("BinaryDroid", "Resource path:"  + ClassLoader.getSystemClassLoader().toString());
 
         pagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
-        pager = (ViewPager) findViewById(R.id.container);
+        pager = findViewById(R.id.container);
         pager.setAdapter(pagerAdapter);
 
         // Add main fragment if this is first creation
@@ -78,6 +86,26 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
         }
     }
 
+    public static void showRootRequestDialog(Activity activity, final SharedPreferences preferences) {
+        int allowRootState = preferences.getInt(PERF_ALLOWROOT, ALLOWROOT_UNSPECIFIED);
+        if (allowRootState == ALLOWROOT_UNSPECIFIED) {
+            Utils.requestSU(activity, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+
+                    SharedPreferences.Editor editor = preferences.edit();
+                    if (which == BUTTON_POSITIVE) {
+                        editor.putInt(PERF_ALLOWROOT, ALLOWROOT_GRANT);
+                    } else {
+                        editor.putInt(PERF_ALLOWROOT, ALLOWROOT_DENY);
+                    }
+                    editor.commit();
+                }
+            });
+        }
+    }
+
     @Override
     public void onSelectBinaryFile(BinaryFile item) {
         onSelectFilePath(item.buildPath());
@@ -107,9 +135,9 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
         public Fragment getItem(int position) {
             switch(position) {
                 case 0:
-                    return binaryListFragment;
-                case 1:
                     return fileBrowserFragment;
+                case 1:
+                    return binaryListFragment;
                 case 2:
                     return symbolSearchFragment;
                 default:
@@ -121,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
             Resources resources = getApplicationContext().getResources();
             switch(position) {
                 case 0:
-                    return resources.getString(R.string.tab_installedapps);
-                case 1:
                     return resources.getString(R.string.tab_filebrowser);
+                case 1:
+                    return resources.getString(R.string.tab_installedapps);
                 case 2:
                     return resources.getString(R.string.tab_symbolsearch);
                 default:

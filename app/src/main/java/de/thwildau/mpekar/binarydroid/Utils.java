@@ -1,6 +1,8 @@
 package de.thwildau.mpekar.binarydroid;
 
-import android.graphics.Paint;
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 
 import de.thwildau.mpekar.binarydroid.assembly.Disassembler;
 
@@ -43,5 +45,17 @@ public class Utils {
             };
         }
         return dummy;
+    }
+
+    public static void requestSU(Activity activity, DialogInterface.OnClickListener clickListener) {
+        // Build dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(R.string.app_name);
+        builder.setMessage(R.string.rootmsg);
+        builder.setPositiveButton(activity.getString(R.string.rootaccept), clickListener);
+        builder.setNegativeButton(activity.getString(R.string.rootdeny), clickListener);
+        // Show dialog
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }
