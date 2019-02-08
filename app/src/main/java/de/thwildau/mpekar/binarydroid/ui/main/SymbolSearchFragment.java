@@ -1,5 +1,6 @@
 package de.thwildau.mpekar.binarydroid.ui.main;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chrisplus.rootmanager.RootManager;
 
@@ -42,6 +43,7 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
     CheckBox ignoreCase;
     CheckBox regexSyntax;
     CheckBox limitSearchApps;
+    Button startSearch;
     View appListDisabledOverlay;
     Set<String> selectedApps;
 
@@ -84,7 +86,7 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
 
         // "start search" button functionality
         final TextView searchString = view.findViewById(R.id.searchView);
-        final Button startSearch = view.findViewById(R.id.btnstartsearch);
+        startSearch = view.findViewById(R.id.btnstartsearch);
         startSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -142,30 +144,42 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
         // Obtain SU permissions
         RootManager.getInstance().obtainPermission();
 
-        BinaryListViewModel vm = ViewModelProviders.of(getActivity()).get(BinaryListViewModel.class);
-        final List<BinaryFile> binaries = vm.getBinaries().getValue();
-        if (binaries != null && binaries.size() > 0) {
-            final SymbolSearchFragment myself = this;
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    SymbolSearcher symbolSearcher = new SymbolSearcher(
-                            binaries,
-                            regexSyntax.isChecked(),
-                            ignoreCase.isChecked());
+        final SymbolSearchFragment myself = this;
+        final BinaryListViewModel vm = ViewModelProviders.of(getActivity()).get(BinaryListViewModel.class);
+        vm.getBinaries().observe(this, new Observer<List<BinaryFile>>() {
+            @Override
+            public void onChanged(@Nullable final List<BinaryFile> binaries) {
+                // Remove observer (new search will create a new one)
+                vm.getBinaries().removeObservers(myself);
+                // Start the search in the background
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        SymbolSearcher symbolSearcher = new SymbolSearcher(
+                                binaries,
+                                regexSyntax.isChecked(),
+                                ignoreCase.isChecked());
 
-                    // Register the search progress listener
-                    symbolSearcher.setListener(myself);
-                    symbolSearcher.search(symbolName);
-                }
-            });
-        } else {
-            Toast.makeText(getContext(), R.string.couldntgetsymbols, Toast.LENGTH_SHORT).show();
-        }
+                        // Register the search progress listener
+                        symbolSearcher.setListener(myself);
+                        // Do the actual searching..
+                        symbolSearcher.search(symbolName);
+                    }
+                });
+            }
+        });
     }
 
     @Override
     public void onSearchStarted() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Disable the button while a search is currently in progress
+                startSearch.setEnabled(false);
+            }
+        });
+
         // Update selected/filtered app list cache
         selectedApps = getSelectedApps();
         Log.d("BinaryDroid", "Starting symbol search");
@@ -178,6 +192,15 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
 
     @Override
     public void onSearchComplete(int symbolCount) {
+        // Re-enable the search button
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Disable the button while a search is currently in progress
+                startSearch.setEnabled(true);
+            }
+        });
+
         Log.d("BinaryDroid", "Symbol search finished, symbolCount=" + symbolCount);
     }
 
