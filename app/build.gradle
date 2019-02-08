@@ -8,7 +8,6 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -16,14 +15,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    /*splits {
-        abi {
-            enable true
-            reset()
-            include 'armeabi-v7a'
-            universalApk true
-        }
-    }*/
 }
 
 dependencies {
@@ -33,20 +24,5 @@ dependencies {
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.chrisplus.rootmanager:library:2.0.5@aar'
-    //implementation files('src/main/jniLibs/libjnidispatch.so')
-    //implementation files('src/main/jniLibs/libcapstone.so')
-}
-
-task unlockPhone(type: Exec) {
-    def adbpath = 'G:\\Apps\\AndroidSDK\\platform-tools\\adb.exe'
-    def unlock = [adbpath, 'shell', 'input', 'keyevent', 'KEYCODE_WAKEUP']
-    def swipe = [adbpath, 'shell', 'input', 'touchscreen', 'swipe', '930', '880', '930', '380']
-    def code = [adbpath, 'shell', 'input', 'text', '2950']
-    commandLine unlock
-    commandLine swipe
-    commandLine code
 }
