@@ -58,4 +58,14 @@ public class Utils {
         AlertDialog alert = builder.create();
         alert.show();
     }
+
+    public static String trimPackageNameNumber(String packageName) {
+        // Sometimes there will be a number appended after the package name.
+        // We don't want that so just trim it off
+        int i = packageName.lastIndexOf("-");
+        if (i > 0) {
+            packageName = packageName.substring(0, i);
+        }
+        return packageName;
+    }
 }

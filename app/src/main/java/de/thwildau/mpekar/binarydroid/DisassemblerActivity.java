@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import net.fornwall.jelf.ElfFile;
 
@@ -51,7 +52,7 @@ public class DisassemblerActivity extends AppCompatActivity
                     ByteAccessor accessor = new ByteAccessor(file);
                     viewModel.setAccessor(accessor);
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace(); //TODO: proper handling
+                    e.printStackTrace();
                     finish();
                 }
 
@@ -59,20 +60,17 @@ public class DisassemblerActivity extends AppCompatActivity
                     ElfFile elf = ElfFile.fromFile(file);
                     viewModel.setBinary(new ContainerELF(elf));
                 } catch (IOException e) {
-                    e.printStackTrace(); //TODO: proper handling
+                    e.printStackTrace();
                     finish();
                 }
-
-                //getSupportFragmentManager().beginTransaction()
-                //        .replace(R.id.container, HexEditorFragment.newInstance())
-                //        .commitNow();
             } else {
-                // TODO: error msg
+                Toast.makeText(getApplicationContext(),
+                        R.string.binarynotexists, Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
 
-        // Register viewpager adapter
+        // Register viewpager adapter and install fragment change notifications
         pager = findViewById(R.id.container);
         pagerAdapter = new DisassemblerPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);

@@ -19,4 +19,6 @@
     <string name="rootmsg">In order to use this functionality this application requires superuser access.</string>
     <string name="rootdeny">Deny</string>
     <string name="rootreq">Root request</string>
+    <string name="couldntgetsymbols">Failed to fetch symbols of current file</string>
+    <string name="binarynotexists">Binary file does not exists!</string>
 </resources>

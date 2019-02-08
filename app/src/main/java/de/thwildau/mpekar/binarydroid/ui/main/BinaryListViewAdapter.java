@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.thwildau.mpekar.binarydroid.R;
+import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 
 /**
@@ -48,14 +49,7 @@ public class BinaryListViewAdapter extends RecyclerView.Adapter<BinaryListViewAd
         final BinaryFile binaryFile = appList.get(position);
         holder.binaryFile = binaryFile;
 
-        // Sometimes there will be a number appended after the package name.
-        // We don't want that so just trim it off
-        String packageName = binaryFile.getPackageName();
-        int i = packageName.lastIndexOf("-");
-        if (i > 0) {
-            packageName = packageName.substring(0, i);
-        }
-
+        String packageName = Utils.trimPackageNameNumber(binaryFile.getPackageName());
         holder.container.setBackgroundColor(binaryFile.getColor());
         holder.packageName.setText(packageName);
         holder.architecture.setText(binaryFile.getArch());

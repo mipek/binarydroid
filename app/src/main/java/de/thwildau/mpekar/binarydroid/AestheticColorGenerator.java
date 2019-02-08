@@ -5,6 +5,9 @@ import android.graphics.Color;
 
 import java.util.Random;
 
+/**
+ * Generates random colors.
+ */
 public class AestheticColorGenerator {
     private Random random = new Random();
 
