@@ -19,7 +19,6 @@ import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 import de.thwildau.mpekar.binarydroid.assembly.DisassemblerCapstone;
 import de.thwildau.mpekar.binarydroid.model.ContainerELF;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;
-import de.thwildau.mpekar.binarydroid.ui.disasm.DisasmFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 import de.thwildau.mpekar.binarydroid.ui.disasm.HexEditorFragment;
@@ -80,13 +79,6 @@ public class DisassemblerActivity extends AppCompatActivity
             @Override
             public void onPageSelected(int position)
             {
-                DisasmFragment newFrag = (DisasmFragment)pagerAdapter.getItem(position);
-                int currentPosition = pager.getCurrentItem();
-                if (currentPosition >= 0) {
-                    DisasmFragment oldFrag = (DisasmFragment) pagerAdapter.getItem(currentPosition);
-                    oldFrag.onChangeFragment(false);
-                }
-                newFrag.onChangeFragment(true);
             }
 
             @Override
@@ -109,7 +101,7 @@ public class DisassemblerActivity extends AppCompatActivity
     }
 
     private class DisassemblerPagerAdapter extends FragmentStatePagerAdapter {
-        private DisasmFragment[] fragments;
+        private Fragment[] fragments;
 
         public static final int VIEW_TOTAL_COUNT = 3;
         public static final int VIEW_HEXEDIT = 0;
@@ -118,7 +110,7 @@ public class DisassemblerActivity extends AppCompatActivity
 
         public DisassemblerPagerAdapter(FragmentManager fm) {
             super(fm);
-            fragments = new DisasmFragment[VIEW_TOTAL_COUNT];
+            fragments = new Fragment[VIEW_TOTAL_COUNT];
             fragments[VIEW_HEXEDIT] = new HexEditorFragment();
             fragments[VIEW_DISASM] = new DisassemblerFragment();
             fragments[VIEW_SYMBOLS] = new SymbolFragment();

@@ -1,8 +1,6 @@
 package de.thwildau.mpekar.binarydroid.model;
 
-import java.io.Serializable;
-
-public class SymbolItem implements Serializable {
+public class SymbolItem {
     public final String name;
     public final long addr;
 

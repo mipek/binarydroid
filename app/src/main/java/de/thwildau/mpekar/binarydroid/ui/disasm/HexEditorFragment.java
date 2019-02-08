@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
@@ -20,7 +21,10 @@ import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 
-public class HexEditorFragment extends DisasmFragment {
+/**
+ * This class is responsible for showing the hex viewer.
+ */
+public class HexEditorFragment extends Fragment {
     private static final int BYTES_PER_ROW_LANDSCAPE = 16;
     private static final int BYTES_PER_ROW_PORTRAIT = 8;
     private LayoutManager layoutManager;
@@ -109,15 +113,12 @@ public class HexEditorFragment extends DisasmFragment {
         return v;
     }
 
-    public void onChangeFragment(boolean isActive) {
-    }
-
     class ViewHolder extends android.support.v7.widget.RecyclerView.ViewHolder {
-        TextView addr;
-        TextView ascii;
-        TextView bytes;
+        final TextView addr;
+        final TextView ascii;
+        final TextView bytes;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             this.addr = (TextView) view.findViewById(R.id.hexed_addr);
             this.bytes = (TextView) view.findViewById(R.id.hexed_bytes);

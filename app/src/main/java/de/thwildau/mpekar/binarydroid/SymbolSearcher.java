@@ -35,10 +35,16 @@ public class SymbolSearcher {
         return listener;
     }
 
+
     public void setListener(SymbolSearchInterface listener) {
         this.listener = listener;
     }
 
+    /**
+     * Search for a particular symbol.
+     * @param symbolName                Name of the symbol that is to be found
+     * @throws PatternSyntaxException   Exception thrown if regex syntax is invalid
+     */
     public void search(String symbolName) throws PatternSyntaxException {
         SymbolSearchInterface listener = getListener();
         if (listener == null) {
