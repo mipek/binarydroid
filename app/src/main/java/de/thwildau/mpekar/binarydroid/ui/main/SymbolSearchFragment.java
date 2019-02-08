@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chrisplus.rootmanager.RootManager;
 
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.SymbolSearcher;
@@ -93,6 +95,11 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
             @Override
             public void onClick(View view) {
                 final String symbolName = searchString.getText().toString();
+                if (symbolName.isEmpty()) {
+                    Toast.makeText(
+                            getContext(), R.string.missingsymbolname, Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 // Make sure we have root access
                 final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -165,7 +172,22 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
                         // Register the search progress listener
                         symbolSearcher.setListener(myself);
                         // Do the actual searching..
-                        symbolSearcher.search(symbolName);
+                        try {
+                            symbolSearcher.search(symbolName);
+                        } catch (PatternSyntaxException ex) {
+                            // Regex syntax is invalid, abort search
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(
+                                            getContext(),
+                                            R.string.invalidregexsyntax,
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            // Call search compelte callback to re-enable the "start search"-button
+                            onSearchComplete(-1);
+                        }
                     }
                 });
             }
@@ -197,7 +219,7 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
     }
 
     @Override
-    public void onSearchComplete(int symbolCount) {
+    public void onSearchComplete(final int symbolCount) {
         // Re-enable the search button
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -206,10 +228,12 @@ public class SymbolSearchFragment extends Fragment implements SymbolSearchInterf
                 startSearch.setEnabled(true);
                 startSearch.setText(R.string.startsymbolsearch);
 
-                // Show results in a new activity
-                Intent intent = new Intent(getActivity(), SymbolSearchResultActivity.class);
-                intent.putExtra(SymbolSearchResultActivity.EXTRA_RESULTS, searchResults);
-                startActivity(intent);
+                if (symbolCount > 0) {
+                    // Show results in a new activity
+                    Intent intent = new Intent(getActivity(), SymbolSearchResultActivity.class);
+                    ActivityResult.symbolSearchResults = searchResults;
+                    startActivity(intent);
+                }
             }
         });
 

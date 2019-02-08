@@ -1,7 +1,5 @@
 package de.thwildau.mpekar.binarydroid.ui.main;
 
-import java.io.Serializable;
-
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;
 
@@ -35,7 +33,7 @@ public interface SymbolSearchInterface {
      */
     boolean shouldSkipApp(String packageName);
 
-    class ResultEntry implements Serializable {
+    class ResultEntry {
         public final BinaryFile binary;
         public final SymbolItem symbol;
 

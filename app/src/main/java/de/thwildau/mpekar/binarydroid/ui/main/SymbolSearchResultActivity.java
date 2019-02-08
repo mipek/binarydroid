@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.Utils;
@@ -23,11 +23,10 @@ import de.thwildau.mpekar.binarydroid.model.SymbolItem;
  * This activity is responsible for displaying the symbol search results.
  */
 public class SymbolSearchResultActivity extends AppCompatActivity {
-    public static final String EXTRA_RESULTS = "results";
 
     LinearLayoutManager layoutManager;
     private RecyclerView recyclerView;
-    private ArrayList<SymbolSearchInterface.ResultEntry> results;
+    private List<SymbolSearchInterface.ResultEntry> results;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -35,8 +34,7 @@ public class SymbolSearchResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.symbolsearchresult_activity);
 
-        results = (ArrayList<SymbolSearchInterface.ResultEntry>)
-                getIntent().getSerializableExtra(EXTRA_RESULTS);
+        results = ActivityResult.symbolSearchResults;
 
         final PackageManager packageManager = getPackageManager();
         recyclerView = findViewById(R.id.symbolsearchresults);
@@ -77,6 +75,13 @@ public class SymbolSearchResultActivity extends AppCompatActivity {
                 return results.size();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Delete symbol search result
+        ActivityResult.symbolSearchResults = null;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
