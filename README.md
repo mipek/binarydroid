@@ -16,9 +16,9 @@ It currently uses Capstone for disassembling under the hood.
 
 ## Dependencies
 This application utilizes the following open-source libraries:
-- [Capstone](https://github.com/aquynh/capstone)
-- [jelf](https://github.com/fornwall/jelf)
-- [RootManager](https://github.com/Chrisplus/RootManager)
+- [Capstone](https://github.com/aquynh/capstone) (disassembly/disassembler framework)
+- [jelf](https://github.com/fornwall/jelf) (ELF parsing library in java)
+- [RootManager](https://github.com/Chrisplus/RootManager) (helper utility for SU functionality)
 
 ## Todo
 I have a couple of things in mind that would be cool to add in future versions:
@@ -26,3 +26,5 @@ I have a couple of things in mind that would be cool to add in future versions:
 - Improve architecture support (add x86, mips, ....)
 - Implement mode switching (ARM and Thumb) - should be easy enough given that we use Capstone
 - Graph-View disassembler (as seen in IDA or x64dbg)
+- Editing bytes in the HexView (essentially turning it into a HexEditor)
+- Patching/modifying the assembly
