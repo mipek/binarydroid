@@ -1,11 +1,16 @@
 package de.thwildau.mpekar.binarydroid;
 
+import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +34,9 @@ import de.thwildau.mpekar.binarydroid.ui.disasm.AssemblerDialog;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 import de.thwildau.mpekar.binarydroid.ui.disasm.HexEditorFragment;
+import de.thwildau.mpekar.binarydroid.ui.disasm.SaveFileDialog;
 import de.thwildau.mpekar.binarydroid.ui.disasm.SymbolFragment;
+import de.thwildau.mpekar.binarydroid.ui.disasm.ToolFragment;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 
@@ -40,6 +47,7 @@ import static android.content.DialogInterface.BUTTON_POSITIVE;
 public class DisassemblerActivity extends AppCompatActivity
         implements SymbolFragment.OnSymbolSelectListener {
     public static final String EXTRA_BINPATH = "extra_binpath";
+    private static final int REQUEST_WRITE_STORAGE = 101;
 
     private ViewPager pager;
     private DisassemblerPagerAdapter pagerAdapter;
@@ -141,12 +149,38 @@ public class DisassemblerActivity extends AppCompatActivity
             case R.id.menu_symbols:
                 pager.setCurrentItem(DisassemblerPagerAdapter.VIEW_SYMBOLS);
                 return true;
-            case R.id.menu_assembler:
+            case R.id.menu_assembler: {
                 DisassemblerViewModel viewModel =
                         ViewModelProviders.of(this).get(DisassemblerViewModel.class);
                 Disassembler disassembler = viewModel.getDisasm().getValue();
-                AssemblerDialog dialog = new AssemblerDialog(this, disassembler);
-                dialog.show();
+                ByteAccessor accessor = viewModel.getAccessor().getValue();
+                if (disassembler != null && accessor != null) {
+                    // show (single line) assembler dialog
+                    AssemblerDialog dialog = new AssemblerDialog(
+                            this, disassembler, accessor,
+                            new AssemblerDialog.Callback() {
+                                @Override
+                                public void onDialogAction(boolean positive) {
+                                    if (positive) {
+                                        // we need to invalidate the currently active view
+                                        // when the data it displays has been changed.
+                                        ToolFragment activeTool = (ToolFragment)
+                                                pagerAdapter.getItem(pager.getCurrentItem());
+                                        activeTool.onRunCommand(ToolFragment.CMD_REFRESHVIEW);
+                                    }
+                                }
+                            }
+                    );
+                    dialog.show();
+                } else {
+                    // This shouldn't happen..
+                    Toast.makeText(this,
+                            "No disasm and/or accessor available", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+            case R.id.menu_savefile:
+                requestPermissionWriteExternal();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -192,8 +226,45 @@ public class DisassemblerActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
     }
 
+    private void requestPermissionWriteExternal() {
+        boolean hasPermission =
+                (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_WRITE_STORAGE);
+        } else {
+            openFileSaveDialog();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_WRITE_STORAGE) {
+            // Did the user gave us permission?
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openFileSaveDialog();
+            } else {
+                Toast.makeText(this, R.string.missingwriteperm, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void openFileSaveDialog() {
+        DisassemblerViewModel viewModel =
+                ViewModelProviders.of(this).get(DisassemblerViewModel.class);
+        ByteAccessor byteAccessor = viewModel.getAccessor().getValue();
+        if (byteAccessor != null) {
+            SaveFileDialog dialog = new SaveFileDialog(this, byteAccessor);
+            dialog.show();
+        }
+    }
+
     private class DisassemblerPagerAdapter extends FragmentStatePagerAdapter {
-        private Fragment[] fragments;
+        private ToolFragment[] fragments;
 
         public static final int VIEW_TOTAL_COUNT = 3;
         public static final int VIEW_HEXEDIT = 0;
@@ -203,7 +274,7 @@ public class DisassemblerActivity extends AppCompatActivity
         public DisassemblerPagerAdapter(FragmentManager fm) {
             super(fm);
 
-            fragments = new Fragment[VIEW_TOTAL_COUNT];
+            fragments = new ToolFragment[VIEW_TOTAL_COUNT];
             fragments[VIEW_HEXEDIT] = new HexEditorFragment();
             fragments[VIEW_DISASM] = new DisassemblerFragment();
             fragments[VIEW_SYMBOLS] = new SymbolFragment();
@@ -227,7 +298,5 @@ public class DisassemblerActivity extends AppCompatActivity
         public int getCount() {
             return fragments.length;
         }
-
-
     }
 }

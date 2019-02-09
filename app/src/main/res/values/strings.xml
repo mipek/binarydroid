@@ -33,4 +33,19 @@
     <string name="assembly">Assembly</string>
     <string name="dialog_abort">Abort</string>
     <string name="dialog_assemble">Assemble</string>
+    <string name="asmerr_lookupfail">Invalid Syntax, tried to lookup: %1$s</string>
+    <string name="asmerr_limitreached">Assembling failed, failure limit reached</string>
+    <string name="asmerr_cannotasm">Failed to assemble; please check the operands</string>
+    <string name="asmerr_untermreglist">Unterminated register list</string>
+    <string name="asmerr_unexpectedchar">Unexpected character at: %1$s (original input: %2$s)</string>
+    <string name="asmerr_unrecognizedtoken">Unrecognized token: %1$s (original input: %2$s)</string>
+    <string name="asmerr_invreg">Invalid register: %1$s</string>
+    <string name="pleaseinputstuff">Please input address and assembly code</string>
+    <string name="menu_assemble">Assemble</string>
+    <string name="menu_savefile">Save modified file</string>
+    <string name="saveyes">Save</string>
+    <string name="saveno">Back</string>
+    <string name="savefileerror">Couldn\'t save file, please check the path</string>
+    <string name="missingwriteperm">In order to save the file you must grant write storage permissions</string>
+    <string name="savecomplete">Save complete!</string>
 </resources>

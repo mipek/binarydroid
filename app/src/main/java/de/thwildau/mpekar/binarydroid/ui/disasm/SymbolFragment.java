@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +22,7 @@ import de.thwildau.mpekar.binarydroid.model.SymbolItem;
  * Activities containing this fragment MUST implement the {@link OnSymbolSelectListener}
  * interface.
  */
-public class SymbolFragment extends Fragment {
+public class SymbolFragment extends ToolFragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
 

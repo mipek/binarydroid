@@ -40,7 +40,7 @@ public class AssemblerOracle implements Assembler {
         // look it up
         LookupTable.TableEntry info = LookupTable.getInstance().lookup(syntax);
         if (info == null) {
-            throw new AssemblerException("invalid syntax, tried to lookup: " + syntax);
+            throw new AssemblerException(AssemblerError.LookupFailed, syntax);
         }
 
         // start with the parent
@@ -90,7 +90,7 @@ public class AssemblerOracle implements Assembler {
                 
                 failures++;
                 if (failures > FAILURES_LIMIT) {
-                    throw new AssemblerException(("failure limit reached"));
+                    throw new AssemblerException(AssemblerError.FailureLimitReached);
                 }
 
                 failstreak++;
@@ -123,7 +123,7 @@ public class AssemblerOracle implements Assembler {
                         }
 
                         if (failures > FAILURES_LIMIT) {
-                            throw new AssemblerException("cannot assemble, valid operands?");
+                            throw new AssemblerException(AssemblerError.CannotAssemble);
                         }
                     }
                 }
@@ -138,7 +138,6 @@ public class AssemblerOracle implements Assembler {
     // SECOND shot at manipulating the assembling process
     private int hookMiddle(int seed, int insword, int bit) {
         return insword;
-        //return Integer.reverseBytes(insword);
     }
 
     // Last shot at manipulating the assembling process.

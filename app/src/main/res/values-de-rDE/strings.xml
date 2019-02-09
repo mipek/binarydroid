@@ -29,8 +29,23 @@
     <string name="symbollist">Symbole</string>
     <string name="symbolgotoquestion">Wo soll das Symbol angezeigt werden?</string>
     <string name="secetionunknown">Unbekannt</string>
-    <string name="address">Address</string>
+    <string name="address">Addresse</string>
     <string name="assembly">Assembler</string>
     <string name="dialog_abort">Abbruch</string>
     <string name="dialog_assemble">Assemblieren</string>
+    <string name="asmerr_lookupfail">Ungültiger Syntax, kein Ergebnis für %1$s gefunden</string>
+    <string name="asmerr_limitreached">Fehlerlimit erreicht; Assemblieren fehlgeschlagen</string>
+    <string name="asmerr_cannotasm">Assemblieren fehlgeschlagen; bitte überprüfen Sie die Operanten</string>
+    <string name="asmerr_untermreglist">Fehler: nicht terminierte Registerliste</string>
+    <string name="asmerr_unexpectedchar">Unerwartetes Zeichen: %1$s (Eingabe war: %2$s)</string>
+    <string name="asmerr_unrecognizedtoken">Ungültiges Token: %1$s (Eingabe war: %2$s)</string>
+    <string name="asmerr_invreg">Ungültiger Register: %1$s</string>
+    <string name="pleaseinputstuff">Bitte Adresse und Assemblercode angeben!</string>
+    <string name="menu_assemble">Assembler</string>
+    <string name="menu_savefile">Datei speichern</string>
+    <string name="saveyes">Speichern</string>
+    <string name="saveno">Zurück</string>
+    <string name="savefileerror">Datei konnte nicht gepsichert werden. Bitte überprüfen Sie den Dateipfad!</string>
+    <string name="missingwriteperm">Damit die Datei gespeichert werden kann sind Schreibrechte erforderlich!</string>
+    <string name="savecomplete">Datei gespeichert!</string>
 </resources>

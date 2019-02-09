@@ -13,5 +13,8 @@
         android:title="@string/symbollist" />
     <item
         android:id="@+id/menu_assembler"
-        android:title="Assembler" />
+        android:title="@string/menu_assemble" />
+    <item
+        android:id="@+id/menu_savefile"
+        android:title="@string/menu_savefile" />
 </menu>

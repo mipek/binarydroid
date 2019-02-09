@@ -20,4 +20,6 @@
         <activity android:name=".ui.main.SymbolSearchResultActivity"/>
     </application>
 
+    <!-- We only need this permission when saving modified binaries. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 </manifest>

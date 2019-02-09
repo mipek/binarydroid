@@ -167,7 +167,7 @@ class Tokenizer {
                             break;
                         }
                     } else {
-                        throw new AssemblerException("unterminated register list");
+                        throw new AssemblerException(AssemblerError.UnterminatedRegisterList);
                     }
                     ++i;
                 }
@@ -182,8 +182,8 @@ class Tokenizer {
 
             // otherwise, error
             else {
-                throw new AssemblerException("unexpected character at: " + i
-                        + " (original input: " + assembly + ")");
+                throw new AssemblerException(AssemblerError.UnexpectedChar,
+                        Integer.toString(i), assembly);
             }
         }
 
@@ -263,8 +263,8 @@ class Tokenizer {
                         if (val != null) {
                             tokens.add(new Token(TokenType.SHIFT, val.longValue(), ""));
                         } else {
-                            throw new AssemblerException("unrecognized token: " + tok +
-                            " (original string: " + assembly + " )");
+                            throw new AssemblerException(AssemblerError.UnrecognizedToken,
+                                    tok, assembly);
                         }
                     }
                 }
@@ -340,7 +340,7 @@ class Tokenizer {
         } else if (ch1 == 'p' && ch2 == 'c') {
             return 15;
         } else {
-            throw new AssemblerException("invalid register: " + reg);
+            throw new AssemblerException(AssemblerError.InvalidRegister, reg);
         }
     }
 

@@ -54,6 +54,8 @@ public class SymbolRecyclerViewAdapter extends RecyclerView.Adapter<SymbolRecycl
                 }
             }
         }
+        // reload data
+        notifyDataSetChanged();
     }
 
     // Return the section the symbol points to
@@ -117,7 +119,10 @@ public class SymbolRecyclerViewAdapter extends RecyclerView.Adapter<SymbolRecycl
 
     @Override
     public int getItemCount() {
-        return values.size();
+        if (values != null) {
+            return values.size();
+        }
+        return 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
