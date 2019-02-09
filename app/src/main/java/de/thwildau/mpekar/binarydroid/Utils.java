@@ -6,19 +6,25 @@ import android.support.v7.app.AlertDialog;
 
 import de.thwildau.mpekar.binarydroid.assembly.Disassembler;
 
+/**
+ * Utility functions
+ */
 public class Utils {
     private static final String HEXCHARS = "0123456789ABCDEF";
 
+    // long to string
     public static String l2s(long value, int pad) {
         return String.format("%0" + pad + "X", value);
     }
 
+    // byte to string
     public static String b2s(byte value) {
         StringBuilder builder = new StringBuilder();
         b2s(builder, value);
         return builder.toString();
     }
 
+    // byte to string (using a existing StringBuilder)
     public static void b2s(StringBuilder builder, byte value) {
         builder.append(HEXCHARS.charAt((value & 0xF0) >> 4))
                .append(HEXCHARS.charAt(value & 0x0F));
@@ -26,8 +32,20 @@ public class Utils {
 
     private static Disassembler.Instruction dummy;
     public static Disassembler.Instruction dummyInstruction(final short size) {
+        // We use this dummy object to make our life easier because we do not have to
+        // check if this is a valid instruction or not.
         if (dummy == null || dummy.size() != size) {
             dummy = new Disassembler.Instruction() {
+                @Override
+                public String mnemonic() {
+                    return "undef";
+                }
+
+                @Override
+                public String operands() {
+                    return "";
+                }
+
                 @Override
                 public short size() {
                     return size;
@@ -40,7 +58,7 @@ public class Utils {
 
                 @Override
                 public String toString() {
-                    return "undef";
+                    return mnemonic();
                 }
             };
         }

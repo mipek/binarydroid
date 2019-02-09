@@ -9,7 +9,6 @@ import capstone.Capstone;
 public class DisassemblerCapstone implements Disassembler {
     private static Capstone cs;
 
-
     @Override
     public Instruction [] disassemble(ByteAccessor accessor, long address, int size) {
         ByteBuffer buf = accessor.getBytes(address, size);
@@ -17,9 +16,7 @@ public class DisassemblerCapstone implements Disassembler {
             return new InstructionCapstone[0];
         }
 
-        if (cs == null) {
-            cs = new Capstone(Capstone.CS_ARCH_ARM, Capstone.CS_MODE_ARM);
-        }
+        ensureCs();
 
         Capstone.CsInsn[] capInsns = cs.disasm(buf.array(), buf.limit());
         InstructionCapstone[] insns = new InstructionCapstone[capInsns.length];
@@ -27,6 +24,26 @@ public class DisassemblerCapstone implements Disassembler {
             insns[i] = new InstructionCapstone(capInsns[i]);
         }
         return insns;
+    }
+
+    @Override
+    public Instruction [] disassemble(byte [] code, long address, int bytes) {
+        ensureCs();
+
+        Capstone.CsInsn[] capInsns = cs.disasm(code, bytes);
+        InstructionCapstone[] insns = new InstructionCapstone[capInsns.length];
+        for (int i=0; i<insns.length; ++i) {
+            insns[i] = new InstructionCapstone(capInsns[i]);
+        }
+        return insns;
+    }
+
+    // Ensures that we have a valid Capstone instance
+    private void ensureCs() {
+        if (cs == null) {
+            cs = new Capstone(Capstone.CS_ARCH_ARM,
+                    Capstone.CS_MODE_LITTLE_ENDIAN | Capstone.CS_MODE_ARM);
+        }
     }
 
     private class InstructionCapstone implements Instruction {
@@ -37,13 +54,23 @@ public class DisassemblerCapstone implements Disassembler {
         }
 
         @Override
+        public String mnemonic() {
+            return insn.mnemonic;
+        }
+
+        @Override
+        public String operands() {
+            return insn.opStr;
+        }
+
+        @Override
         public short size() {
             return insn.size;
         }
 
         @Override
         public boolean isReturn() {
-            // TODO: we can probably get something out of opinfo (like EIP being modified)
+            // TODO: we can probably get something out of opinfo (like EIP being modified?)
             // ARM branch
             final byte [] branch = fromHexString("C7 FC FF EA");
             final byte [] ldmfd = fromHexString("70 8C BD E8");
