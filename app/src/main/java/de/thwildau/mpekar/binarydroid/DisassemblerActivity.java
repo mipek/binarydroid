@@ -21,9 +21,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
+import de.thwildau.mpekar.binarydroid.assembly.Disassembler;
 import de.thwildau.mpekar.binarydroid.assembly.DisassemblerCapstone;
 import de.thwildau.mpekar.binarydroid.model.ContainerELF;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;
+import de.thwildau.mpekar.binarydroid.ui.disasm.AssemblerDialog;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 import de.thwildau.mpekar.binarydroid.ui.disasm.HexEditorFragment;
@@ -138,6 +140,13 @@ public class DisassemblerActivity extends AppCompatActivity
                 return true;
             case R.id.menu_symbols:
                 pager.setCurrentItem(DisassemblerPagerAdapter.VIEW_SYMBOLS);
+                return true;
+            case R.id.menu_assembler:
+                DisassemblerViewModel viewModel =
+                        ViewModelProviders.of(this).get(DisassemblerViewModel.class);
+                Disassembler disassembler = viewModel.getDisasm().getValue();
+                AssemblerDialog dialog = new AssemblerDialog(this, disassembler);
+                dialog.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

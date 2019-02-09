@@ -29,4 +29,8 @@
     <string name="symbollist">Symbole</string>
     <string name="symbolgotoquestion">Wo soll das Symbol angezeigt werden?</string>
     <string name="secetionunknown">Unbekannt</string>
+    <string name="address">Address</string>
+    <string name="assembly">Assembler</string>
+    <string name="dialog_abort">Abbruch</string>
+    <string name="dialog_assemble">Assemblieren</string>
 </resources>

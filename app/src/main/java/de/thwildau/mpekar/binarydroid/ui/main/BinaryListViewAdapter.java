@@ -19,7 +19,6 @@ import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link BinaryFile} and makes a call to the
  * specified {@link InteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class BinaryListViewAdapter extends RecyclerView.Adapter<BinaryListViewAdapter.ViewHolder> {
 

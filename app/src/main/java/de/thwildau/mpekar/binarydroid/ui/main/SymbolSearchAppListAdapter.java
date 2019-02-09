@@ -17,6 +17,10 @@ import java.util.List;
 
 import de.thwildau.mpekar.binarydroid.R;
 
+/**
+ * This adapter is responsible for managing the list of installed applications.
+ * The user can check each individual app that he wants to include in his symbol search.
+ */
 class SymbolSearchAppListAdapter extends RecyclerView.Adapter {
     private SymbolSearchFragment symbolSearchFragment;
     private List<SymbolSearchFragment.FilteredAppInfo> appList;

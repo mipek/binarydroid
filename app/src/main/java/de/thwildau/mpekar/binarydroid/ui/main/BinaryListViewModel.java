@@ -15,6 +15,9 @@ import de.thwildau.mpekar.binarydroid.AestheticColorGenerator;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 
 @SuppressWarnings("WeakerAccess")
+/**
+ * Provides the viewmodel to the binary file enumeration.
+ */
 public class BinaryListViewModel extends ViewModel {
     private MutableLiveData<List<BinaryFile>> binaryList;
 
@@ -45,8 +48,6 @@ public class BinaryListViewModel extends ViewModel {
                 binaryList.postValue(binaries);
             }
         }
-        //List<ApplicationInfo> localApps =
-        //        getApplication().getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
     }
 
     private void loadAppBinaries(String packageName, List<BinaryFile> outList) {
@@ -63,7 +64,7 @@ public class BinaryListViewModel extends ViewModel {
                 for (String arch: architectures.split("\n")) {
                     arch = sanitizeFileName(arch);
 
-                    // TODO: properly handle "no such file or directory"..
+                    // TODO: improve binary enumeration
                     if (arch.contains("Nosuchfileordirectory")) continue;
 
                     Log.d("BinaryDroid", "Arch: " + arch);
@@ -79,9 +80,6 @@ public class BinaryListViewModel extends ViewModel {
                             binary = sanitizeFileName(binary);
 
                             Log.d("BinaryDroid", " Bin: " + binary);
-
-                            // DEBUG
-                           // if (!binary.contains("libil2cpp")) continue;
 
                             BinaryFile binaryFile =
                                     new BinaryFile(packageName, arch, binary, randomColor);

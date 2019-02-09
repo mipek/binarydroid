@@ -29,4 +29,8 @@
     <string name="symbollist">Symbols</string>
     <string name="symbolgotoquestion">How do you want to view the symbol?</string>
     <string name="secetionunknown">Unknown</string>
+    <string name="address">Address</string>
+    <string name="assembly">Assembly</string>
+    <string name="dialog_abort">Abort</string>
+    <string name="dialog_assemble">Assemble</string>
 </resources>

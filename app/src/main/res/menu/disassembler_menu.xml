@@ -11,4 +11,7 @@
         android:id="@+id/menu_symbols"
         android:checkable="false"
         android:title="@string/symbollist" />
+    <item
+        android:id="@+id/menu_assembler"
+        android:title="Assembler" />
 </menu>

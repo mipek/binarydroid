@@ -21,6 +21,9 @@ import de.thwildau.mpekar.binarydroid.ui.main.SymbolSearchFragment;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 
+/**
+ * This activity provides the starting point of the disassembler (selecting files etc.)
+ */
 public class MainActivity extends AppCompatActivity implements InteractionListener {
     public static final String PERF_ALLOWROOT = "allowroot";
     public static final int ALLOWROOT_UNSPECIFIED = 0;
