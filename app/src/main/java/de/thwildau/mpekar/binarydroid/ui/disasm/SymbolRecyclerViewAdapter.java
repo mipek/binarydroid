@@ -31,8 +31,8 @@ public class SymbolRecyclerViewAdapter extends RecyclerView.Adapter<SymbolRecycl
     private HashMap<String, Integer> sectionColors;
     private final OnSymbolSelectListener listener;
 
-    public SymbolRecyclerViewAdapter(List<SymbolItem> items, OnSymbolSelectListener listener) {
-        this.values = items;
+    public SymbolRecyclerViewAdapter(OnSymbolSelectListener listener) {
+        this.values = null;
         this.listener = listener;
     }
 

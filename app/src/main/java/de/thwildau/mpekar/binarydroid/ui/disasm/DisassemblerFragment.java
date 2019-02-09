@@ -13,11 +13,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 import de.thwildau.mpekar.binarydroid.assembly.Disassembler;
 import de.thwildau.mpekar.binarydroid.model.Container;
+import de.thwildau.mpekar.binarydroid.model.SymbolItem;
 
 /**
  * Fragment responsible for showing the disassembly.
@@ -27,6 +31,7 @@ public class DisassemblerFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView recyclerView;
     private DisassemblerViewModel viewModel;
+    private Map<Integer, SymbolItem> symbolMap;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -49,6 +54,17 @@ public class DisassemblerFragment extends Fragment {
             public void onChanged(@Nullable Container container) {
                 final int wordSize = container.getWordSize();
 
+                // Update symbol map
+                symbolMap = new HashMap<>();
+                for (SymbolItem symbol: container.getSymbols()) {
+                    int addr = (int) symbol.addr;
+                    // add Symbol only if absent
+                    if (!symbolMap.containsKey(addr)) {
+                        symbolMap.put(addr, symbol);
+                    }
+                }
+
+                // Set adapter
                 recyclerView.setAdapter(new RecyclerView.Adapter() {
                     @NonNull
                     @Override
@@ -85,8 +101,18 @@ public class DisassemblerFragment extends Fragment {
                                 insn = Utils.dummyInstruction((short) 4);
                             }
 
+                            SymbolItem symbolForAddress = getSymbolForAddress(address);
+
                             ViewHolder viewHolder = (ViewHolder) holder;
-                            viewHolder.addr.setText(Utils.l2s(address, wordSize));
+                            if (symbolForAddress == null) {
+                                viewHolder.addr.setText(Utils.l2s(address, wordSize));
+                                viewHolder.addr.setTextColor(
+                                        getResources().getColor(R.color.hexaddr));
+                            } else {
+                                viewHolder.addr.setText(symbolForAddress.name);
+                                viewHolder.addr.setTextColor(
+                                        getResources().getColor(R.color.colorAccent));
+                            }
                             viewHolder.mnemonic.setText(insn.toString());
                         }
                     }
@@ -131,6 +157,10 @@ public class DisassemblerFragment extends Fragment {
         });
 
         return v;
+    }
+
+    private SymbolItem getSymbolForAddress(int address) {
+        return symbolMap.get(address);
     }
 
     class ViewHolder extends android.support.v7.widget.RecyclerView.ViewHolder {

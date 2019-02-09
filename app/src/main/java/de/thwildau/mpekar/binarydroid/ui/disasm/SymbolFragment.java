@@ -13,9 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.model.Container;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;
@@ -58,23 +55,27 @@ public class SymbolFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
         viewModel = ViewModelProviders.of(getActivity()).get(DisassemblerViewModel.class);
         viewModel.getBinary().observe(this, new Observer<Container>() {
             @Override
             public void onChanged(@Nullable Container elf) {
                 SymbolRecyclerViewAdapter adapter = (SymbolRecyclerViewAdapter) recyclerView.getAdapter();
                 adapter.setValues(elf.getSections(), elf.getSymbols());
+                // Refresh the view
+                recyclerView.invalidate();
             }
         });
     }
 
-    private List<SymbolItem> getSymbolList() {
-        if (viewModel.getBinary() != null && viewModel.getBinary().getValue() != null) {
-            return viewModel.getBinary().getValue().getSymbols();
-        } else {
-            return new ArrayList<>();
-        }
+    @Override
+    public void onStop() {
+        super.onStop();
+        viewModel.getBinary().removeObservers(this);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class SymbolFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new SymbolRecyclerViewAdapter(getSymbolList(), mListener));
+            recyclerView.setAdapter(new SymbolRecyclerViewAdapter(mListener));
         }
         return view;
     }

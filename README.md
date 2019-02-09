@@ -29,3 +29,4 @@ I have a couple of things in mind that would be cool to add in future versions:
 - Editing bytes in the HexView (essentially turning it into a HexEditor)
 - Patching/modifying the assembly
 - Maybe add option to sync scrolling in the disassembler with hexview and vice versa?
+- More options for the disassembler (show opcode bytes, instruction indentation etc.)

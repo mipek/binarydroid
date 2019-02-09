@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#d81b60</color>
     <color name="hexaddr">#3ac2eb</color>
     <color name="hexbytes">#424242</color>
     <color name="applistbg">#ebebeb</color>
