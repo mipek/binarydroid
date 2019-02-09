@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">BinaryDroid</string>
+    <string name="filebrowser_filepath_placeholder">Dateipfad</string>
+    <string name="filebrowser_open">Öffnen</string>
+    <string name="filebrowser_browserbtn">Dateimanager</string>
+    <string name="tab_installedapps">Installierte Apps</string>
+    <string name="tab_filebrowser">Dateisystem</string>
+    <string name="tab_symbolsearch">Symbolsuche</string>
+    <string name="chk_regexsyntax">regulärer Ausdruck</string>
+    <string name="chk_ignorecase">Groß-/Kleinschreibung ignorieren</string>
+    <string name="chk_limitsearch">Suche auf ausgewählte Apps beschränken</string>
+    <string name="hint_symbolid">Bezeichner</string>
+    <string name="appicon">Anwendungssymbol</string>
+    <string name="startsymbolsearch">Suche starten</string>
+    <string name="nosection">Symbol zeigt auf keine gültige Sektion.</string>
+    <string name="packageiconstr">Paketsymbol</string>
+    <string name="rootrequired">Sie müssen der Anwendung Rootzugang gewähren, damit diese Funktion genutzt werden kann.</string>
+    <string name="rootaccept">Akzeptieren</string>
+    <string name="rootmsg">Um diese Funktion zu nutzen gewähren Sie bitte der Anwendung Rootzugang.</string>
+    <string name="rootdeny">Verweigern</string>
+    <string name="rootreq">Root-Anfrage</string>
+    <string name="couldntgetsymbols">Fehler beim Abrufen der Symbolliste der aktuellen Datei</string>
+    <string name="binarynotexists">Binärdatei wurde nicht gefunden!</string>
+    <string name="searchingsymbol">Suche..</string>
+    <string name="missingsymbolname">Bitte geben Sie einen Symbolnamen ein!</string>
+    <string name="invalidregexsyntax">Ungültiger regulärer Ausdruck</string>
+    <string name="disassembler">Disassembler</string>
+    <string name="hexeditor">HexViewer</string>
+    <string name="symbollist">Symbole</string>
+    <string name="symbolgotoquestion">Wo soll das Symbol angezeigt werden?</string>
+</resources>
