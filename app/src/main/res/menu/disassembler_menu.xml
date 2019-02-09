@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_hexview"
+        android:title="@string/hexeditor" />
+    <item
+        android:id="@+id/menu_disasm"
+        android:title="@string/disassembler" />
+    <item
+        android:id="@+id/menu_symbols"
+        android:checkable="false"
+        android:title="@string/symbollist" />
+</menu>

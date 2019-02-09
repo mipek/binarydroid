@@ -24,4 +24,8 @@
     <string name="searchingsymbol">Searching..</string>
     <string name="missingsymbolname">Please input a symbol name to search for</string>
     <string name="invalidregexsyntax">Invalid regex syntax</string>
+    <string name="disassembler">Disassembler</string>
+    <string name="hexeditor">HexViewer</string>
+    <string name="symbollist">Symbols</string>
+    <string name="symbolgotoquestion">How do you want to view the symbol?</string>
 </resources>

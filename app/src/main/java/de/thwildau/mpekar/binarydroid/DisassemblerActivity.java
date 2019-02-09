@@ -1,12 +1,17 @@
 package de.thwildau.mpekar.binarydroid;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import net.fornwall.jelf.ElfFile;
@@ -23,6 +28,8 @@ import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 import de.thwildau.mpekar.binarydroid.ui.disasm.HexEditorFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.SymbolFragment;
+
+import static android.content.DialogInterface.BUTTON_POSITIVE;
 
 /**
  * The main activity that contains every fragment related to the disassmbler.
@@ -94,14 +101,59 @@ public class DisassemblerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSymbolSelected(SymbolItem item) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.disassembler_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_hexview:
+                pager.setCurrentItem(DisassemblerPagerAdapter.VIEW_HEXEDIT);
+                return true;
+            case R.id.menu_disasm:
+                pager.setCurrentItem(DisassemblerPagerAdapter.VIEW_DISASM);
+                return true;
+            case R.id.menu_symbols:
+                pager.setCurrentItem(DisassemblerPagerAdapter.VIEW_SYMBOLS);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onSymbolSelected(SymbolItem symbol) {
         DisassemblerViewModel viewModel =
                 ViewModelProviders.of(this).get(DisassemblerViewModel.class);
 
-        viewModel.setAddress(item.addr);
+        // set address
+        viewModel.setAddress(symbol.addr);
 
-        // change active view to disassembler
-        pager.setCurrentItem(DisassemblerPagerAdapter.VIEW_DISASM);
+        // ask the user where he wants to view the address?
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.app_name);
+        builder.setMessage(R.string.symbolgotoquestion);
+        DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int item;
+                if (which == BUTTON_POSITIVE) {
+                    item = DisassemblerPagerAdapter.VIEW_DISASM;
+                } else {
+                    item = DisassemblerPagerAdapter.VIEW_HEXEDIT;
+                }
+                // change the active view
+                pager.setCurrentItem(item);
+            }
+        };
+        builder.setPositiveButton(R.string.disassembler, clickListener);
+        builder.setNegativeButton(R.string.hexeditor, clickListener);
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private class DisassemblerPagerAdapter extends FragmentStatePagerAdapter {

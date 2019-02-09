@@ -38,14 +38,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
+        android:maxLines="1"
         android:text="0xDEADBEEF"
         android:textAlignment="textStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toEndOf="@+id/frameLayout2" />
 
     <TextView
@@ -53,16 +54,17 @@
         android:layout_width="0dp"
         android:layout_height="29dp"
         android:layout_margin="@dimen/text_margin"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="6dp"
         android:maxLength="32"
+        android:maxLines="1"
         android:text="__symbolname_verylonglonglonglonglonglonglonglonglong"
         android:textAlignment="textStart"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toEndOf="@+id/frameLayout2"
         app:layout_constraintTop_toTopOf="parent" />
 
