@@ -39,14 +39,14 @@ public class DisassemblerFragment extends Fragment {
 
         viewModel = ViewModelProviders.of(getActivity()).get(DisassemblerViewModel.class);
 
+        //TODO: if we want to support other architectures we cant rely
+        // on a fixed instruction size (think about CISC architectures like x86)
+        final int instructionSize = 4;
+
         // Update adapter whenever we get a (new) binary file.
         viewModel.getBinary().observe(this, new Observer<Container>() {
             @Override
             public void onChanged(@Nullable Container container) {
-                //TODO: if we want to support other architectures we cant rely
-                // on a fixed instruction size (think about CISC architectures like x86)
-                final int instructionSize = 4;
-
                 final int wordSize = container.getWordSize();
 
                 recyclerView.setAdapter(new RecyclerView.Adapter() {
@@ -117,6 +117,16 @@ public class DisassemblerFragment extends Fragment {
                         }
                     }
                 });
+            }
+        });
+
+        // Observe the address, when it changes we need to jump to the specified address
+        viewModel.getAddress().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable Long newAddress) {
+                // One "position" = one instruction. We assume instruction size is always 4 bytes.
+                int position = (int) (newAddress / instructionSize);
+                layoutManager.scrollToPosition(position);
             }
         });
 

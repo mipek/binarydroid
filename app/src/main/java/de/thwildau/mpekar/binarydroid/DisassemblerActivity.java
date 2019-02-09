@@ -24,6 +24,10 @@ import de.thwildau.mpekar.binarydroid.ui.disasm.DisassemblerViewModel;
 import de.thwildau.mpekar.binarydroid.ui.disasm.HexEditorFragment;
 import de.thwildau.mpekar.binarydroid.ui.disasm.SymbolFragment;
 
+/**
+ * The main activity that contains every fragment related to the disassmbler.
+ * (Hexview, Disassembler, Symbollist)
+ */
 public class DisassemblerActivity extends AppCompatActivity
         implements SymbolFragment.OnSymbolSelectListener {
     public static final String EXTRA_BINPATH = "extra_binpath";

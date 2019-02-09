@@ -40,6 +40,9 @@ import static de.thwildau.mpekar.binarydroid.MainActivity.ALLOWROOT_DENY;
 import static de.thwildau.mpekar.binarydroid.MainActivity.ALLOWROOT_GRANT;
 import static de.thwildau.mpekar.binarydroid.MainActivity.PERF_ALLOWROOT;
 
+/**
+ * Implements symbol searching functionality.
+ */
 public class SymbolSearchFragment extends Fragment implements SymbolSearchInterface {
     RecyclerView recyclerView;
     LinearLayoutManager layoutManager;

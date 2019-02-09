@@ -18,6 +18,9 @@ import de.thwildau.mpekar.binarydroid.R;
 
 import static android.app.Activity.RESULT_OK;
 
+/**
+ * Allows the user to analyze files from the file system.
+ */
 public class FileBrowserFragment extends Fragment {
     private static final int BROWSER_REQUEST_CODE = 1337;
     private EditText filePath;
@@ -28,6 +31,7 @@ public class FileBrowserFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_filebrowser, container, false);
         filePath = view.findViewById(R.id.filepath);
+        // Start file browser activity when clicking "browse"-button
         view.findViewById(R.id.btnbrowse).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -36,6 +40,7 @@ public class FileBrowserFragment extends Fragment {
                 startActivityForResult(intent, BROWSER_REQUEST_CODE);
             }
         });
+        // Open file when clicking open..
         view.findViewById(R.id.btnopen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,6 +60,7 @@ public class FileBrowserFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Put path of selected file in our TextView
         if (requestCode == BROWSER_REQUEST_CODE && resultCode == RESULT_OK) {
             try {
                 File f = new File(new URI(data.getDataString()));
@@ -69,6 +75,8 @@ public class FileBrowserFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        // our parent has to implement the InteractionListener interface
         if (context instanceof InteractionListener) {
             listener = (InteractionListener) context;
         } else {

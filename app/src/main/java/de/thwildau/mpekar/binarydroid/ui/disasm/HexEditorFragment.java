@@ -95,22 +95,31 @@ public class HexEditorFragment extends Fragment {
                             return 8;
                         }
                     }
-
-                    // Returns the amount of bytes shown per row
-                    private int getBytesPerRow() {
-                        // TODO: cool feature would be to dynamically adjust this to the
-                        // maximum amount of bytes we can fit on the current screen
-                        int orientation = getResources().getConfiguration().orientation;
-                        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            return BYTES_PER_ROW_LANDSCAPE;
-                        }
-                        return BYTES_PER_ROW_PORTRAIT;
-                    }
                 });
             }
         });
 
+        // Observe the address, when it changes we need to jump to the specified address
+        viewModel.getAddress().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable Long newAddress) {
+                int position = (int) (newAddress / getBytesPerRow());
+                layoutManager.scrollToPosition(position);
+            }
+        });
+
         return v;
+    }
+
+    // Returns the amount of bytes shown per row
+    private int getBytesPerRow() {
+        // TODO: cool feature would be to dynamically adjust this to the
+        // maximum amount of bytes we can fit on the current screen
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            return BYTES_PER_ROW_LANDSCAPE;
+        }
+        return BYTES_PER_ROW_PORTRAIT;
     }
 
     class ViewHolder extends android.support.v7.widget.RecyclerView.ViewHolder {
