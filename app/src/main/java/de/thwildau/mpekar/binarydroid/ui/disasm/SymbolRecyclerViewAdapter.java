@@ -92,7 +92,7 @@ public class SymbolRecyclerViewAdapter extends RecyclerView.Adapter<SymbolRecycl
 
             holder.section.setText(section.name);
         } else {
-            holder.section.setText("Unknown");
+            holder.section.setText(R.string.secetionunknown);
         }
 
         // Set circle color based on section name

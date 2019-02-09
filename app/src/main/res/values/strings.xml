@@ -28,4 +28,5 @@
     <string name="hexeditor">HexViewer</string>
     <string name="symbollist">Symbols</string>
     <string name="symbolgotoquestion">How do you want to view the symbol?</string>
+    <string name="secetionunknown">Unknown</string>
 </resources>
