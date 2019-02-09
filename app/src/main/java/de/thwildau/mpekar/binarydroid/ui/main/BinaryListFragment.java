@@ -40,10 +40,6 @@ public class BinaryListFragment extends Fragment {
     public BinaryListFragment() {
     }
 
-    public static BinaryListFragment newInstance() {
-        return new BinaryListFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

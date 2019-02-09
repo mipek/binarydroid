@@ -41,13 +41,6 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
         pager = findViewById(R.id.container);
         pager.setAdapter(pagerAdapter);
 
-        // Add main fragment if this is first creation
-        //if (savedInstanceState == null) {
-        //    getSupportFragmentManager().beginTransaction()
-        //            .replace(R.id.container, BinaryListFragment.newInstance())
-        //            .commitNow();
-        //}
-
         // Add tabs to the action bar
         final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
