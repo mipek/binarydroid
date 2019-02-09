@@ -85,19 +85,38 @@ public class DisassemblerActivity extends AppCompatActivity
         pagerAdapter = new DisassemblerPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
-        pager.addOnPageChangeListener (new ViewPager.OnPageChangeListener()
-        {
+        // Display active fragment in the ActionBar title
+        ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageSelected(int position)
-            {
+            public void onPageSelected(int position) {
+                int stringId = 0;
+                switch (position) {
+                    case DisassemblerPagerAdapter.VIEW_HEXEDIT:
+                        stringId = R.string.hexeditor;
+                        break;
+                    case DisassemblerPagerAdapter.VIEW_DISASM:
+                        stringId = R.string.disassembler;
+                        break;
+                    case DisassemblerPagerAdapter.VIEW_SYMBOLS:
+                        stringId = R.string.symbollist;
+                        break;
+                }
+
+                if (stringId != 0) {
+                    setActionBarTitle(getString(stringId));
+                }
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {}
+            public void onPageScrollStateChanged(int state) {
+            }
 
             @Override
-            public void onPageScrolled(int position, float arg1, int arg2) {}
-        });
+            public void onPageScrolled(int position, float arg1, int arg2) {
+            }
+        };
+        pager.addOnPageChangeListener (onPageChangeListener);
+        onPageChangeListener.onPageSelected(pager.getCurrentItem());
     }
 
     @Override
@@ -156,6 +175,14 @@ public class DisassemblerActivity extends AppCompatActivity
         alert.show();
     }
 
+    public void setActionBarTitle(String subtitle) {
+        String title = getString(R.string.app_name);
+        if (subtitle != null) {
+            title += " - " + subtitle;
+        }
+        getSupportActionBar().setTitle(title);
+    }
+
     private class DisassemblerPagerAdapter extends FragmentStatePagerAdapter {
         private Fragment[] fragments;
 
@@ -166,6 +193,7 @@ public class DisassemblerActivity extends AppCompatActivity
 
         public DisassemblerPagerAdapter(FragmentManager fm) {
             super(fm);
+
             fragments = new Fragment[VIEW_TOTAL_COUNT];
             fragments[VIEW_HEXEDIT] = new HexEditorFragment();
             fragments[VIEW_DISASM] = new DisassemblerFragment();
@@ -190,5 +218,7 @@ public class DisassemblerActivity extends AppCompatActivity
         public int getCount() {
             return fragments.length;
         }
+
+
     }
 }
