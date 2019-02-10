@@ -39,5 +39,5 @@ I have a couple of things in mind that would be cool to add in future versions:
 
 ## Screenshot
 
-![installed apps](https://abload.de/img/installedapps9fj9h.png =270x480)
-![disassembler](https://abload.de/img/disassemblerh4jxp.png =270x480)
+![installed apps](https://abload.de/img/installedappsy9js8.png)
+![disassembler](https://abload.de/img/disassembleru5j54.png)
