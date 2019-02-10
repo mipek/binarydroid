@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
 import de.thwildau.mpekar.binarydroid.R;
+import de.thwildau.mpekar.binarydroid.SymbolSearchInterface;
 import de.thwildau.mpekar.binarydroid.SymbolSearcher;
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;

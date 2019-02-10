@@ -1,4 +1,4 @@
-package de.thwildau.mpekar.binarydroid.ui.main;
+package de.thwildau.mpekar.binarydroid;
 
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;

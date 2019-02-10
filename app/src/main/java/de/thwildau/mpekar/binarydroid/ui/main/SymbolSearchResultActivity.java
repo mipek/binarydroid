@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.thwildau.mpekar.binarydroid.R;
+import de.thwildau.mpekar.binarydroid.SymbolSearchInterface;
 import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;

@@ -13,7 +13,6 @@ import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 import de.thwildau.mpekar.binarydroid.model.Container;
 import de.thwildau.mpekar.binarydroid.model.ContainerELF;
 import de.thwildau.mpekar.binarydroid.model.SymbolItem;
-import de.thwildau.mpekar.binarydroid.ui.main.SymbolSearchInterface;
 
 /**
  * Contains the logic required to perform symbol searching.

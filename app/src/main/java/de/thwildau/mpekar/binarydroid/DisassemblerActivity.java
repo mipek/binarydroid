@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import net.fornwall.jelf.ElfException;
 import net.fornwall.jelf.ElfFile;
 
 import java.io.File;
@@ -79,7 +80,9 @@ public class DisassemblerActivity extends AppCompatActivity
                 try {
                     ElfFile elf = ElfFile.fromFile(file);
                     viewModel.setBinary(new ContainerELF(elf));
-                } catch (IOException e) {
+                } catch (IOException | ElfException e) {
+                    Toast.makeText(getApplicationContext(),
+                            R.string.invalidelffile, Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                     finish();
                 }
@@ -180,6 +183,9 @@ public class DisassemblerActivity extends AppCompatActivity
                 return true;
             }
             case R.id.menu_savefile:
+                // Request permissions to write on external storage.
+                // The function will automatically open the file save dialog when permissions
+                // have been granted.
                 requestPermissionWriteExternal();
                 return true;
             default:
@@ -218,7 +224,7 @@ public class DisassemblerActivity extends AppCompatActivity
         alert.show();
     }
 
-    public void setActionBarTitle(String subtitle) {
+    private void setActionBarTitle(String subtitle) {
         String title = getString(R.string.app_name);
         if (subtitle != null) {
             title += " - " + subtitle;
@@ -226,6 +232,7 @@ public class DisassemblerActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
     }
 
+    // Requests permission to write on external storage
     private void requestPermissionWriteExternal() {
         boolean hasPermission =
                 (ContextCompat.checkSelfPermission(this,
@@ -253,6 +260,8 @@ public class DisassemblerActivity extends AppCompatActivity
         }
     }
 
+    // Open file save dialog.
+    // This should only be called when you have WRITE_EXTERNAL_STORAGE permissions
     private void openFileSaveDialog() {
         DisassemblerViewModel viewModel =
                 ViewModelProviders.of(this).get(DisassemblerViewModel.class);

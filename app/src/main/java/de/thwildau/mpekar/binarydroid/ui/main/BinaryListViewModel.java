@@ -14,14 +14,13 @@ import java.util.List;
 import de.thwildau.mpekar.binarydroid.AestheticColorGenerator;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
 
-@SuppressWarnings("WeakerAccess")
 /**
  * Provides the viewmodel to the binary file enumeration.
  */
 public class BinaryListViewModel extends ViewModel {
     private MutableLiveData<List<BinaryFile>> binaryList;
 
-    // TODO: add app-private and so on..
+    // TODO: are there additional folders that need to be checked?
     private final String AppDirectory = "/data/app";
 
     LiveData<List<BinaryFile>> getBinaries() {
@@ -45,11 +44,17 @@ public class BinaryListViewModel extends ViewModel {
                     loadAppBinaries(packageName, binaries);
                 }
 
+                // update LiveData
                 binaryList.postValue(binaries);
             }
         }
     }
 
+    /**
+     * Find all binaries in the specified package
+     * @param packageName       Package name
+     * @param outList           List to store all found binaries in
+     */
     private void loadAppBinaries(String packageName, List<BinaryFile> outList) {
         Log.d("BinaryDroid", packageName);
         int randomColor = new AestheticColorGenerator().generateRandomColor();
@@ -59,12 +64,10 @@ public class BinaryListViewModel extends ViewModel {
         if (r.getResult()) {
             String architectures = r.getMessage();
 
-
             if (r.getResult() && !architectures.isEmpty()) {
                 for (String arch: architectures.split("\n")) {
                     arch = sanitizeFileName(arch);
 
-                    // TODO: improve binary enumeration
                     if (arch.contains("Nosuchfileordirectory")) continue;
 
                     Log.d("BinaryDroid", "Arch: " + arch);
@@ -81,6 +84,7 @@ public class BinaryListViewModel extends ViewModel {
 
                             Log.d("BinaryDroid", " Bin: " + binary);
 
+                            // add to list
                             BinaryFile binaryFile =
                                     new BinaryFile(packageName, arch, binary, randomColor);
                             outList.add(binaryFile);

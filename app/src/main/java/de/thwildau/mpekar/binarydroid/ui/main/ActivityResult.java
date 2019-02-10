@@ -2,6 +2,8 @@ package de.thwildau.mpekar.binarydroid.ui.main;
 
 import java.util.List;
 
+import de.thwildau.mpekar.binarydroid.SymbolSearchInterface;
+
 /**
  * This is used to pass large data between different activities, as recommended in
  * the android developer guide:

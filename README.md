@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a simple disassembler application (currently ARM only) for android. It provides basic functionality out of the box but is build with extensibility in mind.
+This is a simple disassembler application (currently ELF & ARM only) for android. It provides basic functionality out of the box but is build with extensibility in mind.
 The application was created as part of the "Android Programming" module at TH-Wildau, Germany.
 
 It currently uses Capstone for disassembling under the hood.
@@ -10,9 +10,11 @@ It currently uses Capstone for disassembling under the hood.
 ## Features
 - Disassemble a file from the file system or a binary from an installed application (SU required).
  - A hexview that displays both the address and ASCII characters (in landscape mode) at a given address
- - Of course, a disassembler that shows mnemonics instead of bytes
+ - Of course, a disassembler that meaningfull stuff instead of bytes
  - Symbol list
 - Search every installed application for a specified symbol (SU required).
+- Patching files
+- Saving the modified file
 
 ## Dependencies
 This application utilizes the following open-source libraries:
@@ -27,6 +29,8 @@ I have a couple of things in mind that would be cool to add in future versions:
 - Implement mode switching (ARM and Thumb) - should be easy enough given that we use Capstone
 - Graph-View disassembler (as seen in IDA or x64dbg)
 - Editing bytes in the HexView (essentially turning it into a HexEditor)
-- Patching/modifying the assembly
+- A more sophisticated assembler engine (currently we shoehorn the disassembler to do this for us)
 - Maybe add option to sync scrolling in the disassembler with hexview and vice versa?
 - More options for the disassembler (show opcode bytes, instruction indentation etc.)
+- A interactive disassembler (follow jumps etc.)
+- Syntax coloring

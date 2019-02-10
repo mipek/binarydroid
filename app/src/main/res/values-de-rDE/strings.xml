@@ -48,4 +48,5 @@
     <string name="savefileerror">Datei konnte nicht gepsichert werden. Bitte überprüfen Sie den Dateipfad!</string>
     <string name="missingwriteperm">Damit die Datei gespeichert werden kann sind Schreibrechte erforderlich!</string>
     <string name="savecomplete">Datei gespeichert!</string>
+    <string name="invalidelffile">Ungültige ELF-Datei</string>
 </resources>

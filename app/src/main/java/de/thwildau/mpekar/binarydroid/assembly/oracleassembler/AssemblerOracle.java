@@ -16,9 +16,7 @@ import de.thwildau.mpekar.binarydroid.assembly.Disassembler;
  */
 public class AssemblerOracle implements Assembler {
     private static final int INSTR_SIZE = 4;
-    private static final int N_OFFSPRING  = 1;
-    private static final int N_BITS_FLIP  = 3;
-    private static final int FAILURES_LIMIT = 4000;
+    private static final int FAILURES_LIMIT = 2200;
     private Disassembler disasm;
     private Tokenizer t;
 
