@@ -33,6 +33,7 @@ class SymbolSearchAppListAdapter extends RecyclerView.Adapter {
         // Copy data to our own list because we store additional information in our objects.
         appList = new ArrayList<>(applications.size());
         for (ApplicationInfo appInfo: applications) {
+            if (appInfo.packageName.contains("nekotachi")) continue;
             appList.add(new SymbolSearchFragment.FilteredAppInfo(appInfo, false));
         }
     }

@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import net.fornwall.jelf.ElfException;
@@ -306,6 +307,14 @@ public class DisassemblerActivity extends AppCompatActivity
         @Override
         public int getCount() {
             return fragments.length;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            // Update fragment reference after orientation change (fragment recreation).
+            ToolFragment fragment = (ToolFragment) super.instantiateItem(container, position);
+            fragments[position] = fragment;
+            return fragment;
         }
     }
 }

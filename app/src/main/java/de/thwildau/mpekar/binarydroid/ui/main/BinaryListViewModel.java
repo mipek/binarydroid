@@ -41,6 +41,7 @@ public class BinaryListViewModel extends ViewModel {
                 String[] apps = r.getMessage().split("\n");
                 for (String packageName: apps) {
                     packageName = sanitizeFileName(packageName);
+                    if (packageName.contains("mm.gk") || packageName.contains("manga")) continue;
                     loadAppBinaries(packageName, binaries);
                 }
 

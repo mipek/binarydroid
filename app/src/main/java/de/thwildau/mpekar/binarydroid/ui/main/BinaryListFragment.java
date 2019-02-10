@@ -3,6 +3,7 @@ package de.thwildau.mpekar.binarydroid.ui.main;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,7 +20,10 @@ import java.util.List;
 
 import de.thwildau.mpekar.binarydroid.MainActivity;
 import de.thwildau.mpekar.binarydroid.R;
+import de.thwildau.mpekar.binarydroid.Utils;
 import de.thwildau.mpekar.binarydroid.model.BinaryFile;
+
+import static android.content.DialogInterface.BUTTON_POSITIVE;
 
 /**
  * A fragment representing a list of Items.
@@ -56,24 +60,23 @@ public class BinaryListFragment extends Fragment {
 
         final SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        // Kick this off to initialize the scene
-        onRootAccessChange(preferences);
+        // Kick this off to initialize the fragment view
+        onRootAccessChange(preferences, false);
 
         // Add root request button that triggers the messagebox
         rootRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivity.showRootRequestDialog(getActivity(), preferences);
-                onRootAccessChange(preferences);
+                showRootRequestDialog(preferences);
             }
         });
 
         return view;
     }
 
-    private void onRootAccessChange(SharedPreferences preferences) {
+    private void onRootAccessChange(SharedPreferences preferences, boolean allowOverride) {
         int allowRootState = preferences.getInt(MainActivity.PERF_ALLOWROOT, MainActivity.ALLOWROOT_DENY);
-        if (allowRootState != MainActivity.ALLOWROOT_GRANT) {
+        if (!allowOverride && allowRootState != MainActivity.ALLOWROOT_GRANT) {
             // Hide root required message and request button if access was already granted.
             rootInfo.setVisibility(View.VISIBLE);
             rootRequest.setVisibility(View.VISIBLE);
@@ -100,6 +103,26 @@ public class BinaryListFragment extends Fragment {
         }
     }
 
+    private void showRootRequestDialog(final SharedPreferences preferences) {
+        int allowRootState = preferences.getInt(MainActivity.PERF_ALLOWROOT, MainActivity.ALLOWROOT_UNSPECIFIED);
+        if (allowRootState == MainActivity.ALLOWROOT_UNSPECIFIED) {
+            Utils.requestSU(getActivity(), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+
+                    SharedPreferences.Editor editor = preferences.edit();
+                    if (which == BUTTON_POSITIVE) {
+                        editor.putInt(MainActivity.PERF_ALLOWROOT, MainActivity.ALLOWROOT_GRANT);
+                    } else {
+                        editor.putInt(MainActivity.PERF_ALLOWROOT, MainActivity.ALLOWROOT_DENY);
+                    }
+                    editor.commit();
+                    onRootAccessChange(preferences, (which == BUTTON_POSITIVE));
+                }
+            });
+        }
+    }
 
     @Override
     public void onAttach(Context context) {

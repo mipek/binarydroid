@@ -1,9 +1,13 @@
 package de.thwildau.mpekar.binarydroid.ui.main;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +27,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class FileBrowserFragment extends Fragment {
     private static final int BROWSER_REQUEST_CODE = 1337;
+    private static final int REQUEST_READ_STORAGE = 1338;
     private EditText filePath;
     private InteractionListener listener;
 
@@ -45,15 +50,47 @@ public class FileBrowserFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    String path = filePath.getText().toString();
-                    File f = new File(path);
-                    if (f.exists()) {
-                        listener.onSelectFilePath(path);
-                    }
+                    tryToOpenFile();
                 }
             }
         });
         return view;
+    }
+
+    // Actually opens the file. Only call this when you have "read external storage" permissions.
+    private void doFileOpen() {
+        String path = filePath.getText().toString();
+        File f = new File(path);
+        if (f.exists()) {
+            listener.onSelectFilePath(path);
+        }
+    }
+
+    // Requests permission to read on external storage if required
+    private void tryToOpenFile() {
+        boolean hasPermission =
+                (ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        if (!hasPermission) {
+            requestPermissions(new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
+        } else {
+            doFileOpen();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_READ_STORAGE) {
+            // Did the user gave us permission?
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doFileOpen();
+            } else {
+                Toast.makeText(getContext(), R.string.missingreadperm, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override

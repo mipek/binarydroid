@@ -1,10 +1,7 @@
 package de.thwildau.mpekar.binarydroid;
 
 import android.app.ActionBar;
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,8 +15,6 @@ import de.thwildau.mpekar.binarydroid.ui.main.BinaryListFragment;
 import de.thwildau.mpekar.binarydroid.ui.main.FileBrowserFragment;
 import de.thwildau.mpekar.binarydroid.ui.main.InteractionListener;
 import de.thwildau.mpekar.binarydroid.ui.main.SymbolSearchFragment;
-
-import static android.content.DialogInterface.BUTTON_POSITIVE;
 
 /**
  * This activity provides the starting point of the disassembler (selecting files etc.)
@@ -79,26 +74,6 @@ public class MainActivity extends AppCompatActivity implements InteractionListen
                     actionBar.newTab()
                             .setText(pagerAdapter.getItemName(i))
                             .setTabListener(tabListener));
-        }
-    }
-
-    public static void showRootRequestDialog(Activity activity, final SharedPreferences preferences) {
-        int allowRootState = preferences.getInt(PERF_ALLOWROOT, ALLOWROOT_UNSPECIFIED);
-        if (allowRootState == ALLOWROOT_UNSPECIFIED) {
-            Utils.requestSU(activity, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-
-                    SharedPreferences.Editor editor = preferences.edit();
-                    if (which == BUTTON_POSITIVE) {
-                        editor.putInt(PERF_ALLOWROOT, ALLOWROOT_GRANT);
-                    } else {
-                        editor.putInt(PERF_ALLOWROOT, ALLOWROOT_DENY);
-                    }
-                    editor.commit();
-                }
-            });
         }
     }
 

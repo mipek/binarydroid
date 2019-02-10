@@ -29,6 +29,7 @@ public class DisassemblerFragment extends ToolFragment {
 
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
     private DisassemblerViewModel viewModel;
     private Map<Integer, SymbolItem> symbolMap;
 
@@ -64,7 +65,7 @@ public class DisassemblerFragment extends ToolFragment {
                 }
 
                 // Set adapter
-                recyclerView.setAdapter(new RecyclerView.Adapter() {
+                adapter = new RecyclerView.Adapter() {
                     @NonNull
                     @Override
                     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -141,7 +142,8 @@ public class DisassemblerFragment extends ToolFragment {
                             return null;
                         }
                     }
-                });
+                };
+                recyclerView.setAdapter(adapter);
             }
         });
 
@@ -160,8 +162,8 @@ public class DisassemblerFragment extends ToolFragment {
 
     @Override
     public void onRunCommand(int commandId) {
-        if (commandId == CMD_REFRESHVIEW) {
-            recyclerView.getAdapter().notifyDataSetChanged();
+        if (commandId == CMD_REFRESHVIEW && adapter != null) {
+            adapter.notifyDataSetChanged();
         }
     }
 

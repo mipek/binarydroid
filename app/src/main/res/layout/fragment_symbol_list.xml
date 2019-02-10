@@ -10,4 +10,7 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ui.disasm.SymbolFragment"
-    tools:listitem="@layout/symbol_fragment" />
+    tools:listitem="@layout/symbol_fragment"
+    android:scrollbars="vertical"
+    android:scrollbarThumbVertical="@android:color/darker_gray"
+    android:scrollbarSize="4dp" />
