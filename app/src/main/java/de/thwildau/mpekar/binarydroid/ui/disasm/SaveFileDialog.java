@@ -17,6 +17,9 @@ import java.io.IOException;
 import de.thwildau.mpekar.binarydroid.R;
 import de.thwildau.mpekar.binarydroid.assembly.ByteAccessor;
 
+/**
+ * Dialog to save the (modified) file to disk.
+ */
 public class SaveFileDialog extends Dialog implements View.OnClickListener {
     private ByteAccessor accessor;
     private EditText savePath;

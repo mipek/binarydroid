@@ -1,7 +1,12 @@
 package de.thwildau.mpekar.binarydroid.model;
 
+/**
+ * Describes a single symbol.
+ */
 public class SymbolItem {
+    /**< Symbol identifier */
     public final String name;
+    /**< Symbol address */
     public final long addr;
 
     public SymbolItem(String name, long addr) {

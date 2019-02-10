@@ -65,6 +65,7 @@ public class Utils {
         return dummy;
     }
 
+    // Build the dialog that tells the user that we are about to request SU permissions.
     public static void requestSU(Activity activity, DialogInterface.OnClickListener clickListener) {
         // Build dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -77,9 +78,9 @@ public class Utils {
         alert.show();
     }
 
+    // Sometimes there will be a number appended after the package name (in /data/apps).
+    // We don't want that so just trim it off
     public static String trimPackageNameNumber(String packageName) {
-        // Sometimes there will be a number appended after the package name.
-        // We don't want that so just trim it off
         int i = packageName.lastIndexOf("-");
         if (i > 0) {
             packageName = packageName.substring(0, i);
