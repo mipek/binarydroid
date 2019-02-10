@@ -2,15 +2,54 @@ package de.thwildau.mpekar.binarydroid.model;
 
 import java.util.List;
 
+/**
+ * Describes a binary file format.
+ */
 public interface Container {
+    /**
+     * Returns the architecture of the executeable code in this container
+     * @return  Architecture
+     */
     Architectures getArch();
+
+    /**
+     * Returns the entrypoint address
+     * @return  Entrypoint address
+     */
     long getEntryPoint();
+
+    /**
+     * Returns a list of all sections that are specified for this container
+     * @return  Section list
+     */
     List<Section> getSections();
+
+    /**
+     * Returns a list of all symbols that are exported in the container
+     * @return  Symbol list
+     */
     List<SymbolItem> getSymbols();
+
+    /**
+     * Returns the name of the container (for example: ELF, PE and so on...)
+     * @return  Container name
+     */
     String getName();
+
+    /**
+     * Returns the "native" word size (based on the used architecture).
+     * For example:
+     *  - x86 has a word size of 4 bytes (32 bit)
+     *  - AMD64 has a word size of 8 bytes (64 bit)
+     * @return  word size
+     */
     byte getWordSize();
 
+    /**
+     * Describes a section in a executeable.
+     */
     class Section {
+        /**< Section name */
         public String name;
         /**< Virtual address */
         public long va;
