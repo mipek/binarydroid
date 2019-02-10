@@ -50,4 +50,5 @@
     <string name="savecomplete">Datei gespeichert!</string>
     <string name="invalidelffile">Ungültige ELF-Datei</string>
     <string name="missingreadperm">Keine Leseberechtigung um die Datei zu öffnen!</string>
+    <string name="invalidpath">Ungültiger Dateipfad</string>
 </resources>

@@ -18,6 +18,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import de.thwildau.mpekar.binarydroid.ContentResolver;
 import de.thwildau.mpekar.binarydroid.R;
 
 import static android.app.Activity.RESULT_OK;
@@ -99,13 +100,12 @@ public class FileBrowserFragment extends Fragment {
 
         // Put path of selected file in our TextView
         if (requestCode == BROWSER_REQUEST_CODE && resultCode == RESULT_OK) {
-            try {
-                File f = new File(new URI(data.getDataString()));
-                filePath.setText(f.getAbsolutePath());
-            } catch (URISyntaxException e) {
-                Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
+            String path = ContentResolver.getPath(getContext(), data.getData());
+            if (path == null || path.isEmpty()) {
+                Toast.makeText(getContext(), R.string.invalidpath, Toast.LENGTH_LONG).show();
+                return;
             }
+            filePath.setText(path);
         }
     }
 

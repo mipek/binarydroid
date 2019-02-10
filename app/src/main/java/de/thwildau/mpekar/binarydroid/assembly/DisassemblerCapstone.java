@@ -1,5 +1,7 @@
 package de.thwildau.mpekar.binarydroid.assembly;
 
+import android.util.Log;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -18,12 +20,17 @@ public class DisassemblerCapstone implements Disassembler {
 
         ensureCs();
 
-        Capstone.CsInsn[] capInsns = cs.disasm(buf.array(), buf.limit());
-        InstructionCapstone[] insns = new InstructionCapstone[capInsns.length];
-        for (int i=0; i<insns.length; ++i) {
-            insns[i] = new InstructionCapstone(capInsns[i]);
+        //Log.d("BinaryDroid", "Addr=" + address + ", Diasm byte count = " + buf.limit());
+        try {
+            Capstone.CsInsn[] capInsns = cs.disasm(buf.array(), buf.limit());
+            InstructionCapstone[] insns = new InstructionCapstone[capInsns.length];
+            for (int i = 0; i < insns.length; ++i) {
+                insns[i] = new InstructionCapstone(capInsns[i]);
+            }
+            return insns;
+        } catch (Exception e) {
+            return new InstructionCapstone[0];
         }
-        return insns;
     }
 
     @Override
@@ -42,7 +49,7 @@ public class DisassemblerCapstone implements Disassembler {
     private void ensureCs() {
         if (cs == null) {
             cs = new Capstone(Capstone.CS_ARCH_ARM,
-                    Capstone.CS_MODE_LITTLE_ENDIAN | Capstone.CS_MODE_ARM);
+                    Capstone.CS_MODE_ARM);
         }
     }
 

@@ -50,4 +50,5 @@
     <string name="savecomplete">Save complete!</string>
     <string name="invalidelffile">Invalid ELF file</string>
     <string name="missingreadperm">Can\'t open file without read permissions!</string>
+    <string name="invalidpath">Invalid file path</string>
 </resources>
