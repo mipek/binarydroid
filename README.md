@@ -7,6 +7,8 @@ The application was created as part of the "Android Programming" module at TH-Wi
 
 It currently uses Capstone for disassembling under the hood.
 
+This application currently only runs on ARM devices.
+
 ## Features
 - Disassemble a file from the file system or a binary from an installed application (SU required).
  - A hexview that displays both the address and ASCII characters (in landscape mode) at a given address
@@ -34,3 +36,8 @@ I have a couple of things in mind that would be cool to add in future versions:
 - More options for the disassembler (show opcode bytes, instruction indentation etc.)
 - A interactive disassembler (follow jumps etc.)
 - Syntax coloring
+
+## Screenshot
+
+![installed apps](https://abload.de/img/installedapps9fj9h.png)
+![disassembler](https://abload.de/img/disassemblerh4jxp.png)
