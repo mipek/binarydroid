@@ -3,7 +3,7 @@
 ## Description
 
 This is a simple disassembler application (currently ELF & ARM only) for android. It provides basic functionality out of the box but is build with extensibility in mind.
-The application was created as part of the "Android Programming" module at TH-Wildau, Germany.
+The application was created as part of the "Android Programming" module at TH-Wildau, Germany (https://www.th-wildau.de/index.php?id=12750).
 
 It currently uses Capstone for disassembling under the hood.
 

@@ -273,6 +273,9 @@ public class DisassemblerActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Manages all fragments (or "tools") that are displayed when a binary is open.
+     */
     private class DisassemblerPagerAdapter extends FragmentStatePagerAdapter {
         private ToolFragment[] fragments;
 
